@@ -25,8 +25,6 @@ public class PlayerController : MonoBehaviour
     }
 
     void Start() { 
-        Debug.Log("Couldn't find Respawn Object on map");
-        return;
     }
     
     void FixedUpdate()
