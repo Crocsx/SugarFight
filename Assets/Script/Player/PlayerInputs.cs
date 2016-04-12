@@ -35,8 +35,12 @@ public class PlayerInputs : MonoBehaviour {
 
         if(Input.GetButtonDown(_pHandler.id + "_Jump"))
             _pController.onJump();
-        
-            
+
+        if (Input.GetButtonDown(_pHandler.id + "_Block"))
+            _pController.Block(true);
+
+        if (Input.GetButtonUp(_pHandler.id + "_Block"))
+            _pController.Block(false);
 
         if (Input.GetButtonDown(_pHandler.id + "_Fire1"))
             _pController.onAttack(0);

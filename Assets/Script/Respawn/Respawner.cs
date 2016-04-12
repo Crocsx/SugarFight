@@ -50,7 +50,7 @@ public class Respawner : MonoBehaviour {
 
     public void AttachPlayer()
     {
-        _playerRef.GetComponent<PlayerControl>().enabled = false;
+        _playerRef.GetComponent<PlayerHandler>().Disable();
         _playerRef.position = transform.position;
         _playerRef.parent = _transform;
         isAvailable = false;
@@ -58,7 +58,7 @@ public class Respawner : MonoBehaviour {
 
     public void DetachPlayer()
     {
-        _playerRef.GetComponent<PlayerControl>().enabled = true;
+        _playerRef.GetComponent<PlayerHandler>().Enable();
         _transform.position = _sPosition;
         _playerRef.parent = null;
         isAvailable = true;

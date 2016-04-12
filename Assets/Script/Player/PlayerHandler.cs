@@ -18,7 +18,7 @@ public class PlayerHandler : MonoBehaviour {
 
     // INTERFACE -------------------------------------------------
 
-    void Start () {
+    void Awake () {
         _transform = transform;
         _pControl = _transform.GetComponent<PlayerControl>();
         _pInputs = _transform.GetComponent<PlayerInputs>();
@@ -28,11 +28,26 @@ public class PlayerHandler : MonoBehaviour {
 	
 	}
 
+
     // METHODS -------------------------------------------------
 
     public void askDie()
     {
         if (OnDeath != null)
             OnDeath(id, transform);
+    }
+
+    public void Disable()
+    {
+        _transform.GetComponent<Rigidbody>().isKinematic = true;
+        _pControl.Reset();
+        _pControl.enabled = false;
+    }
+
+    public void Enable()
+    {
+        _transform.GetComponent<Rigidbody>().isKinematic = false;
+        _pControl.Reset();
+        _pControl.enabled = true;
     }
 }

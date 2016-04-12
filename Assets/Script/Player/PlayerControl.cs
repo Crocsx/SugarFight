@@ -24,15 +24,25 @@ public class PlayerControl : MonoBehaviour
 
     [Header("FIGHT PARAMS")]
     public float attackRate = 0.3f;
-    public float TimeInvulnerable;
-    public float noDamageTimer;
-
+    public float TimeInvulnerable = 1.0f;
+    float noDamageTimer = 0;
     public Attack[] attacks = new Attack[2];
+
+    [Header("BLOCK PARAMS")]
+    [Range(0, 1)]
+    public float blockSlowAmount = 0.2f;
 
     Rigidbody _rigidbody;
     Animator _animator;
     Transform _transform;
     Vector3 _initRotation;
+
+    bool _isDamaged;
+    bool isDamaged
+    {
+        get { return _isDamaged; }
+        set { _isDamaged = value; if (_isDamaged) { _animator.SetTrigger("Damage"); } }
+    }
 
     bool _isInvulnerable = false;
     bool isInvulnerable
@@ -69,6 +79,13 @@ public class PlayerControl : MonoBehaviour
         set { _isFalling = value; _animator.SetBool("isFalling", value); }
     }
 
+    bool _isBlocking = false;
+    bool isBlocking
+    {
+        get { return _isBlocking; }
+        set { _isBlocking = value; _animator.SetBool("Blocking", value); }
+    }
+
     int _currentAttack = -1;
     int currentAttack
     {
@@ -86,20 +103,22 @@ public class PlayerControl : MonoBehaviour
 
     void Awake()
     {
-        _transform  = transform;
-        _rigidbody  = _transform.GetComponent<Rigidbody>();
-        _animator   = _transform.GetChild(0).GetComponent<Animator>();
+        _transform = transform;
+        _rigidbody = _transform.GetComponent<Rigidbody>();
+        _animator = _transform.GetChild(0).GetComponent<Animator>();
     }
 
     void Start()
     {
         movement = Vector3.zero;
-        ResetJump();
+        Reset();
         _initRotation = transform.eulerAngles;
-        for (var i = 0; i< attacks.Length; i++)
+
+        for (var i = 0; i < attacks.Length; i++)
         {
             attacks[i].script.Setup(attacks[i], _transform);
         }
+
         OnUpdate += Fall;
         OnUpdate += Move;
     }
@@ -130,11 +149,11 @@ public class PlayerControl : MonoBehaviour
 
     void Jump()
     {
-        _jmpDuration -= Time.deltaTime;
-        _jmpForce += Time.deltaTime;
+        _jmpDuration -= Time.fixedDeltaTime;
+        _jmpForce += Time.fixedDeltaTime;
         if (_jmpDuration > 0)
         {
-            _rigidbody.velocity = new Vector3(_rigidbody.velocity.y, _jmpForce);
+            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _jmpForce, _rigidbody.velocity.z);
         }
         else
         {
@@ -158,9 +177,9 @@ public class PlayerControl : MonoBehaviour
         attacks[currentAttack].timePressed++;
         if (attacks[currentAttack].attack)
         {
-            attacks[currentAttack].attackTimer += Time.deltaTime;
+            attacks[currentAttack].attackTimer += Time.fixedDeltaTime;
 
-            if(attacks[currentAttack].attackTimer > attackRate || attacks[currentAttack].timePressed >= 4)
+            if (attacks[currentAttack].attackTimer > attackRate || attacks[currentAttack].timePressed >= 4)
             {
                 StopAttack();
             }
@@ -169,18 +188,29 @@ public class PlayerControl : MonoBehaviour
 
     void Damage()
     {
-        if (!_isInvulnerable)
+        noDamageTimer += Time.fixedDeltaTime;
+        if (noDamageTimer > TimeInvulnerable)
         {
-            noDamageTimer += Time.deltaTime;
-            if(noDamageTimer > TimeInvulnerable)
-            {
-                _isInvulnerable = false;
-                noDamageTimer = 0;
-            }
-        }
+            isDamaged = false;
+            noDamageTimer = 0;
+            OnUpdate -= Damage;
+        }   
     }
 
     // METHODS --------------------------------------------------
+
+    public void Block(bool value)
+    {
+        _rigidbody.velocity = Vector3.zero;
+
+        if (value)
+            ReduceSpeed(blockSlowAmount);
+        else
+            AugmentSpeed(blockSlowAmount);
+
+        isBlocking = value;
+    }
+
 
     public void onMove(Vector3 axis)
     {
@@ -190,7 +220,7 @@ public class PlayerControl : MonoBehaviour
     public void Move()
     {
         ScaleCheck(_movement);
-        _rigidbody.AddForce(_movement * moveSpeed * Time.deltaTime * 1000);
+        _rigidbody.AddForce(_movement * moveSpeed * Time.fixedDeltaTime * 1000);
     }
 
     public void onJump()
@@ -223,8 +253,13 @@ public class PlayerControl : MonoBehaviour
 
     public void OnDamaged(float damage, Transform player)
     {
-        Vector3 dir = player.transform.position - _transform.position;
-        _rigidbody.AddForce(-dir * damage * 150);
+        if (!isDamaged && !isBlocking)
+        {
+            isDamaged = true;
+            Vector3 dir = player.transform.position - _transform.position;
+            _rigidbody.AddForce(-dir * damage * 150);
+            OnUpdate += Damage;
+        }
     }
 
     void OnEnterGround()
@@ -255,6 +290,21 @@ public class PlayerControl : MonoBehaviour
             transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y + 45, _initRotation.z);
         else if(axis.y == 0.0f)
             transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y, _initRotation.z);
+    }
 
+    public void Reset()
+    {
+        _rigidbody.velocity = Vector3.zero;
+        ResetJump();
+    }
+
+    void ReduceSpeed(float slow)
+    {
+        moveSpeed = moveSpeed * (1 - slow);
+    }
+
+    void AugmentSpeed(float boost)
+    {
+        moveSpeed = moveSpeed / (1 - boost);
     }
 }
