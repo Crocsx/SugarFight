@@ -21,7 +21,7 @@ public class PlayerInputs : MonoBehaviour {
 	void Update ()
     {
         CheckInputs();
-        _Controller.axisUpdate(new Vector3(_currAxis.y, 0, _currAxis.x));
+        _Controller.onMove(new Vector3(_currAxis.y, 0, _currAxis.x));
     }
 
     // METHODS -----------------------------------------------------

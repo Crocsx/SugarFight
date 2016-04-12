@@ -8,6 +8,9 @@ public class PlayerControl : MonoBehaviour
     public delegate void OnDeathEvent(string pName, Transform transform);
     public event OnDeathEvent OnDeath;
 
+    public delegate void OnGroundedEvent();
+    public OnGroundedEvent OnGrounded;
+
     // PROPERTIES ------------------------------------------------- 
 
     public delegate void onUpdate();
@@ -36,18 +39,18 @@ public class PlayerControl : MonoBehaviour
     Animator _animator;
     Transform _transform;
 
-    bool _isGrounded;
-    bool isGrounded
-    {
-        get { return _isGrounded; }
-        set { _isGrounded = value; _animator.SetBool("OnGround", value); }
-    }
-
     bool _isJumping;
     bool isJumping
     {
         get { return _isJumping; }
         set { _isJumping = value; }
+    }
+
+    bool _isGrounded;
+    bool isGrounded
+    {
+        get { return _isGrounded; }
+        set { _isGrounded = value; _animator.SetBool("OnGround", value); }
     }
 
     Vector3 _movement;
@@ -61,7 +64,7 @@ public class PlayerControl : MonoBehaviour
     bool isFalling
     {
         get { return _isFalling; }
-        set { _isFalling = value; _animator.SetBool("isFalling", false); }
+        set { _isFalling = value; _animator.SetBool("isFalling", value); }
     }
 
     // INTERFACE ------------------------------------------------- 
@@ -76,6 +79,9 @@ public class PlayerControl : MonoBehaviour
     void Start()
     {
         _movement = Vector3.zero;
+        ResetJump();
+
+        OnUpdate += Fall;
         OnUpdate += Move;
     }
 
@@ -83,6 +89,22 @@ public class PlayerControl : MonoBehaviour
     {
         if (OnUpdate != null)
             OnUpdate();
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("Ground"))
+        {
+            OnEnterGround();
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.collider.CompareTag("Ground"))
+        {
+            OnLeaveGround();
+        }
     }
 
     // STATES --------------------------------------------------
@@ -93,25 +115,34 @@ public class PlayerControl : MonoBehaviour
         _jmpForce += Time.deltaTime;
         if (_jmpDuration > 0)
         {
-            //_rigidbody.AddForce(Vector3.up * _jmpForce * Time.deltaTime * 1000);
             _rigidbody.velocity = new Vector3(_rigidbody.velocity.y, _jmpForce);
         }
         else
         {
             OnUpdate -= Jump;
+            OnGrounded += ResetJump;
         }
     }
 
-    // METHODS ------------------------------------------------- 
+    void Fall()
+    {
+        if (_rigidbody.velocity.y < 0)
+        {
+            isFalling = true;
+            OnUpdate -= Fall;
+        }
+    }
+
+    // METHODS --------------------------------------------------
+
+    public void onMove(Vector3 axis)
+    {
+        _movement = new Vector3(axis.x, 0, axis.z);
+    }
 
     public void Move()
     {
         _rigidbody.AddForce(_movement * moveSpeed * Time.deltaTime * 1000);
-    }
-
-    public void axisUpdate(Vector3 axis)
-    {
-        _movement = new Vector3(axis.x, 0, axis.z);
     }
 
     public void onJump()
@@ -119,41 +150,31 @@ public class PlayerControl : MonoBehaviour
         OnUpdate += Jump;
     }
 
-    public void askDie()
+    void ResetJump()
     {
-        if (OnDeath != null)
-            OnDeath(id, transform);
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.CompareTag("Ground"))
-        {
-            OnEnterGround();
-        }
-    }
-   
-
-    void OnCollisionExit(Collision collision)
-    {
-        if (collision.collider.CompareTag("Ground"))
-        {
-            OnLeaveGround();
-        }
+        _jmpForce = jumpForce;
+        _jmpDuration = jumpDuration;
+        OnGrounded -= ResetJump;
     }
 
     void OnEnterGround()
     {
-        isGrounded = true;
+        if (OnGrounded != null)
+            OnGrounded();
+
         isFalling = false;
-
-        _jmpForce = jumpForce;
-        _jmpDuration = jumpDuration;
-
+        isGrounded = true;
     }
 
     void OnLeaveGround()
     {
         isGrounded = false;
+        OnUpdate += Fall;
+    }
+
+    public void askDie()
+    {
+        if (OnDeath != null)
+            OnDeath(id, transform);
     }
 }
