@@ -6,7 +6,7 @@ public class PlayerInputs : MonoBehaviour {
     // PROPERTIES -----------------------------------------------------
 
     Transform           _transform;
-    PlayerController    _Controller;
+    PlayerControl      _Controller;
     Vector2             _currAxis;
 
     // INTERFACE -----------------------------------------------------
@@ -14,7 +14,7 @@ public class PlayerInputs : MonoBehaviour {
     void Start ()
     {
         _transform = transform;
-        _Controller = _transform.GetComponent<PlayerController>();
+        _Controller = _transform.GetComponent<PlayerControl>();
     }
 	
 
