@@ -6,7 +6,8 @@ public class PlayerInputs : MonoBehaviour {
     // PROPERTIES -----------------------------------------------------
 
     Transform           _transform;
-    PlayerControl      _Controller;
+    PlayerControl       _pController;
+    PlayerHandler       _pHandler;
     Vector2             _currAxis;
 
     // INTERFACE -----------------------------------------------------
@@ -14,24 +15,33 @@ public class PlayerInputs : MonoBehaviour {
     void Start ()
     {
         _transform = transform;
-        _Controller = _transform.GetComponent<PlayerControl>();
+        _pController = _transform.GetComponent<PlayerControl>();
+        _pHandler = _transform.GetComponent<PlayerHandler>();
     }
 	
 
 	void Update ()
     {
         CheckInputs();
-        _Controller.onMove(new Vector3(_currAxis.y, 0, _currAxis.x));
+        _pController.onMove(new Vector3(_currAxis.y, 0, _currAxis.x));
     }
 
     // METHODS -----------------------------------------------------
 
     void CheckInputs()
     {
-        _currAxis.x = Input.GetAxis("Vertical");
-        _currAxis.y = Input.GetAxis("Horizontal");
+        _currAxis.x = Input.GetAxis(_pHandler.id + "_Vertical");
+        _currAxis.y = Input.GetAxis(_pHandler.id + "_Horizontal");
 
-        if(Input.GetButtonDown("Jump"))
-            _Controller.onJump();
+        if(Input.GetButtonDown(_pHandler.id + "_Jump"))
+            _pController.onJump();
+        
+            
+
+        if (Input.GetButtonDown(_pHandler.id + "_Fire1"))
+            _pController.onAttack(0);
+        
+        if (Input.GetButtonDown(_pHandler.id + "_Fire2"))
+            _pController.onAttack(1);
     }
 }
