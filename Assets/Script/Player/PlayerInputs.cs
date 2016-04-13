@@ -7,6 +7,7 @@ public class PlayerInputs : MonoBehaviour {
 
     Transform           _transform;
     PlayerControl       _pController;
+    PlayerFigher        _pFighter;
     PlayerHandler       _pHandler;
     Vector2             _currAxis;
 
@@ -16,6 +17,7 @@ public class PlayerInputs : MonoBehaviour {
     {
         _transform = transform;
         _pController = _transform.GetComponent<PlayerControl>();
+        _pFighter = _transform.GetComponent<PlayerFigher>();
         _pHandler = _transform.GetComponent<PlayerHandler>();
     }
 	
@@ -37,15 +39,15 @@ public class PlayerInputs : MonoBehaviour {
             _pController.onJump();
 
         if (Input.GetButtonDown(_pHandler.id + "_Block"))
-            _pController.Block(true);
+            _pFighter.Block(true);
 
         if (Input.GetButtonUp(_pHandler.id + "_Block"))
-            _pController.Block(false);
+            _pFighter.Block(false);
 
         if (Input.GetButtonDown(_pHandler.id + "_Fire1"))
-            _pController.onAttack(0);
+            _pFighter.onAttack(0);
         
         if (Input.GetButtonDown(_pHandler.id + "_Fire2"))
-            _pController.onAttack(1);
+            _pFighter.onAttack(1);
     }
 }
