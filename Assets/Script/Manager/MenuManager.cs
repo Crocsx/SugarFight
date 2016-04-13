@@ -4,6 +4,10 @@ using System.Collections;
 public class MenuManager : MonoBehaviour {
 
     public GameObject bgClickToPlay;
+    public GameObject btnPlay;
+    public GameObject btnRules;
+    public GameObject btnOptions;
+    public GameObject btnCredits;
 
     bool isClicked;
 
@@ -23,29 +27,41 @@ public class MenuManager : MonoBehaviour {
         }
     }
 
-    // Use this for initialization
     void Start () {
-	
+        btnPlay.SetActive(false);
+        btnRules.SetActive(false);
+        btnOptions.SetActive(false);
+        btnCredits.SetActive(false);
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-    public void salut()
-    {
-        Debug.Log("salut");
-    }
 
     public void TitlecardClickedFirstTime()
     {
-        Debug.Log("function");
         if(!isClicked)
         {
-            Debug.Log("clicked");
             isClicked = true;
-            bgClickToPlay.transform.Translate(10, 0, 0);
+            StartCoroutine(BgClickToPlayMove());
         }
+    }
+
+    // L'élément "Click to Play" du Titlecar se retire progressivement
+    IEnumerator BgClickToPlayMove()
+    {
+        Vector3 startPosition = bgClickToPlay.transform.position;
+        Vector3 endPosition = startPosition + new Vector3(250, 0, 0);
+        float elapsedTime = 0;
+
+        while (elapsedTime < 1)
+        {
+            bgClickToPlay.transform.position = Vector3.Lerp(startPosition, endPosition, elapsedTime / 1);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        bgClickToPlay.SetActive(false);
+        btnPlay.SetActive(true);
+        btnRules.SetActive(true);
+        btnOptions.SetActive(true);
+        btnCredits.SetActive(true);
     }
 }
