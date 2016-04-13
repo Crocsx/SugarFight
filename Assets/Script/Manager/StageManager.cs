@@ -7,7 +7,7 @@ public class StageManager : MonoBehaviour {
     // EVENTS -----------------------------------------------------
 
     public delegate void OnPlayerSpawnDelegate(GameObject player);
-    public event OnPlayerSpawnDelegate OnPlayerSpawn;
+    public OnPlayerSpawnDelegate OnPlayerSpawn;
 
     // PROPERTIES --------------------------------------------------------
 

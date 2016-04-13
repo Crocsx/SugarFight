@@ -11,6 +11,13 @@ public class PlayerInputs : MonoBehaviour {
     PlayerHandler       _pHandler;
     Vector2             _currAxis;
 
+    bool _blockButton;
+    bool blockButton
+    {
+        get { return blockButton; }
+        set { blockButton = value; _pFighter.Block(value);}
+    }
+
     // INTERFACE -----------------------------------------------------
 
     void Start ()
@@ -24,11 +31,23 @@ public class PlayerInputs : MonoBehaviour {
 
 	void Update ()
     {
+        CheckAxis();
         CheckInputs();
         _pController.onMove(new Vector3(_currAxis.y, 0, _currAxis.x));
     }
 
     // METHODS -----------------------------------------------------
+
+    void CheckAxis()
+    {
+        _currAxis.x = Input.GetAxis(_pHandler.id + "_Vertical");
+        _currAxis.y = Input.GetAxis(_pHandler.id + "_Horizontal");
+
+        if ((Input.GetAxis(_pHandler.id + "_Block") > 0) && !_blockButton)
+            blockButton = true;
+        if ((Input.GetAxis(_pHandler.id + "_Block") <= 0) && _blockButton)
+            blockButton = false;
+    }
 
     void CheckInputs()
     {
@@ -37,12 +56,6 @@ public class PlayerInputs : MonoBehaviour {
 
         if(Input.GetButtonDown(_pHandler.id + "_Jump"))
             _pController.onJump();
-
-        if (Input.GetButtonDown(_pHandler.id + "_Block"))
-            _pFighter.Block(true);
-
-        if (Input.GetButtonUp(_pHandler.id + "_Block"))
-            _pFighter.Block(false);
 
         if (Input.GetButtonDown(_pHandler.id + "_Fire1"))
             _pFighter.onAttack(0);
