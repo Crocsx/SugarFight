@@ -14,8 +14,8 @@ public class PlayerInputs : MonoBehaviour {
     bool _blockButton;
     bool blockButton
     {
-        get { return blockButton; }
-        set { blockButton = value; _pFighter.Block(value);}
+        get { return _blockButton; }
+        set { _blockButton = value; _pFighter.Block(value);}
     }
 
     // INTERFACE -----------------------------------------------------
