@@ -43,8 +43,10 @@ public class FightingCamera : MonoBehaviour {
         centerBefore = Vector3.zero;
         cameraPosBefore = _transform.position;
         centerToCameraBefore = Vector3.Magnitude(_transform.position - center);
+
         players.Clear();
         players.Add(Stage);
+
         EventManager.StartListening("OnStageStart", startSpawn);
 
         myCamera.fieldOfView = ANGLE_VIEW;
