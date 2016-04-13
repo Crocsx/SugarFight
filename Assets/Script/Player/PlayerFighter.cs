@@ -7,7 +7,7 @@ public class PlayerFighter : MonoBehaviour {
     public onUpdate OnUpdate;
 
     [Header("FIGHT PARAMS")]
-    public float attackRate = 0.3f;
+
     public float TimeInvulnerable = 1.0f;
     float noDamageTimer = 0;
     public Attack[] attacks = new Attack[2];
@@ -70,18 +70,19 @@ public class PlayerFighter : MonoBehaviour {
 
     public void onAttack(int value)
     {
+        if (currentAttack != -1)
+            return;
+
         currentAttack = value;
-        OnUpdate += Attack;
+        attacks[currentAttack].Start();
+        OnUpdate += attacks[currentAttack].OnUpdate;
+        attacks[currentAttack].OnAttackEnd += StopAttack;
     }
 
     void StopAttack()
     {
-        OnUpdate -= Attack;
-
-        attacks[currentAttack].attack = false;
-        attacks[currentAttack].attackTimer = 0;
-        attacks[currentAttack].timePressed = 0;
         currentAttack = -1;
+        attacks[currentAttack].OnAttackEnd -= StopAttack;
     }
 
     public void OnDamaged(float damage, Transform player)
@@ -105,23 +106,6 @@ public class PlayerFighter : MonoBehaviour {
             _pControl.AugmentSpeed(blockSlowAmount);
 
         isBlocking = value;
-    }
-
-
-    void Attack()
-    {
-        attacks[currentAttack].attack = true;
-        attacks[currentAttack].attackTimer = 0;
-        attacks[currentAttack].timePressed++;
-        if (attacks[currentAttack].attack)
-        {
-            attacks[currentAttack].attackTimer += Time.fixedDeltaTime;
-
-            if (attacks[currentAttack].attackTimer > attackRate || attacks[currentAttack].timePressed >= 4)
-            {
-                StopAttack();
-            }
-        }
     }
 
     void Damage()
