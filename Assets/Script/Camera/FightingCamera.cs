@@ -34,7 +34,13 @@ public class FightingCamera : MonoBehaviour {
     void Awake ()
     {
         _transform = transform;
+        EventManager.StartListening("OnStageStart", startSpawn);
         myCamera = _transform.GetComponent<Camera>();
+
+        players.Clear();
+        players.Add(Stage);
+
+        _sManager.OnPlayerSpawn += AddPlayer;
     }
 
     // Use this for initialization
@@ -44,13 +50,7 @@ public class FightingCamera : MonoBehaviour {
         cameraPosBefore = _transform.position;
         centerToCameraBefore = Vector3.Magnitude(_transform.position - center);
 
-        players.Clear();
-        players.Add(Stage);
-
-        EventManager.StartListening("OnStageStart", startSpawn);
-
         myCamera.fieldOfView = ANGLE_VIEW;
-        _sManager.OnPlayerSpawn += AddPlayer;
     }
 
     void startSpawn()
@@ -63,6 +63,12 @@ public class FightingCamera : MonoBehaviour {
     public void AddPlayer(GameObject player)
     {
         players.Add(player);
+        playersLength = players.Count;
+    }
+
+    public void RemovePlayer(GameObject player)
+    {
+        players.Remove(player);
         playersLength = players.Count;
     }
 
@@ -139,10 +145,14 @@ public class FightingCamera : MonoBehaviour {
     void updateCenter()
     {
         center = Vector3.zero;
-        for (int i = 0; i < playersLength; i++)
+
+        if (playersLength > 0)
         {
-            center += players[i].transform.position;
+            for (int i = 0; i < playersLength; i++)
+            {
+                center += players[i].transform.position;
+            }
+            center /= playersLength;
         }
-        center /= playersLength;
     }
 }

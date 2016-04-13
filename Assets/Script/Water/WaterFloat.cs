@@ -32,7 +32,6 @@ public class WaterFloat : MonoBehaviour {
         {
             upLift = -Physics.gravity * (forceFactor - GetComponent<Rigidbody>().velocity.y * bounceDamp);
             _rigidbody.AddForceAtPosition(upLift, actionPoint);
-
         }
 
         //
