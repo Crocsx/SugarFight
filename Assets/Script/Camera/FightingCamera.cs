@@ -21,15 +21,15 @@ public class FightingCamera : MonoBehaviour {
     public float MIN_DISTANCE = 5;
     public float MARGIN_ZOOM = 0.25f;
     public StageManager _sManager;
-    public GameObject Stage;
+    //public GameObject Stage;
 
     Camera      myCamera;
     Transform   _transform;
     int         playersLength = 0;
     float       centerToCameraBefore = 0;
     Vector3     centerBefore;
-    Vector3     cameraPosBefore;
     Vector3     center;
+    Vector3     cameraTargetPosition;
 
     void Awake ()
     {
@@ -41,12 +41,10 @@ public class FightingCamera : MonoBehaviour {
     void Start () {
         center = Vector3.zero;
         centerBefore = Vector3.zero;
-        cameraPosBefore = _transform.position;
+        cameraTargetPosition = _transform.position;
         centerToCameraBefore = Vector3.Magnitude(_transform.position - center);
-
         players.Clear();
-        players.Add(Stage);
-
+        //players.Add(Stage);
         EventManager.StartListening("OnStageStart", startSpawn);
 
         myCamera.fieldOfView = ANGLE_VIEW;
@@ -71,7 +69,10 @@ public class FightingCamera : MonoBehaviour {
 
         updateCenter();
 
-        _transform.position += center - centerBefore; //duplique les mvts de la camera
+
+        cameraTargetPosition += center - centerBefore; //duplique les mvts du center pour la caméra
+        //_transform.position  += center - centerBefore; //duplique les mvts de la camera
+        _transform.position  += (cameraTargetPosition - _transform.position) / SMOOTH; // smooth tendant vers cameraTargetPosition
 
         _transform.LookAt(center); // focus centre.
 
