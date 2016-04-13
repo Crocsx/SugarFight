@@ -18,24 +18,27 @@ public class FightingCamera : MonoBehaviour {
     // Expecting 2 players only
     public List<GameObject> players = new List<GameObject>();
 
-    public const int CENTER_TO_CAMERA = 10; // temporary
     public const float ANGLE_VIEW = 45; // degree
-    public const float ANGLE_PLONGE = 45; // degree 0 à 90
     public const float SMOOTH = 14;
     public const float MIN_DISTANCE = 5;
     public const float MARGIN_ZOOM = 0.25f;
-    public Camera myCamera;
     public StageManager _sManager;
 
     public GameObject DERBUG;
 
+    Camera myCamera;
+
     int playersLength = 0;
+    float centerToCameraBefore = 0;
     Vector3 centerBefore = new Vector3();
     Vector3 cameraPosBefore = new Vector3();
-    float centerToCameraBefore = 0;
     Vector3 center = new Vector3();
 
-    //GameObject clone;
+
+    void Awake ()
+    {
+        myCamera = transform.GetComponent<Camera>();
+    }
 
     // Use this for initialization
     void Start () {
@@ -50,22 +53,14 @@ public class FightingCamera : MonoBehaviour {
         cameraPosBefore = myCamera.transform.position;
 
         _sManager.OnPlayerSpawn += AddPlayer;
-        myCamera.transform.LookAt(center);
 
+        myCamera.transform.LookAt(center);
         centerToCameraBefore = Vector3.Magnitude(myCamera.transform.position - center);
 
     }
 	
 	// Update is called once per frame
 	void Update () {
-
-        const float HALF_CAMERA = 0.5f;
-        float pourcentOutHorizontal = 0f; 
-        float pourcentOutVertical = 0f;
-        Vector3 farestPlayerHorizontal = new Vector3();
-        Vector3 farestPlayerVertical = new Vector3();
-
-
 
         updateCenter();
 
@@ -77,13 +72,34 @@ public class FightingCamera : MonoBehaviour {
         myCamera.transform.LookAt(center); // focus centre.
 
 
+        CorrectZoom();
+
+        centerBefore = center;
+    }
+
+    // Permet d'ajouter les players que la caméra suit par code
+    public void AddPlayer(GameObject player)
+    {
+        players.Add(player) ;
+    }
+
+    // corrige le zoom
+    void CorrectZoom()
+    {
+        const float HALF_CAMERA = 0.5f;
+        float pourcentOutHorizontal = 0f;
+        float pourcentOutVertical = 0f;
+        Vector3 farestPlayerHorizontal = new Vector3();
+        Vector3 farestPlayerVertical = new Vector3();
+
+
         // obtenir les dépassements de l'écran en % de taille du viewport
         for (int i = 0; i < playersLength; i++)
         {
             // calcul de la distance la plus éloigné, en vertical ainsi qu'en horizontale
             Vector3 distance = myCamera.WorldToViewportPoint(players[i].transform.position);
             distance -= new Vector3(HALF_CAMERA, HALF_CAMERA, -distance.z); // position à partir du centre de l'écran
-           
+
 
             if (Mathf.Abs(distance.x) > Mathf.Abs(farestPlayerHorizontal.x))
             {
@@ -96,53 +112,33 @@ public class FightingCamera : MonoBehaviour {
             }
 
         }
-        
-        //Debug.Log(farestPlayerHorizontal); // 0.5 0.5 x.x // maintenant c'est règlé de 0.0 à plus
+
         // si 0.1 alors il faut zoomIn de 90% (agrandir)
         // si 1.1 alros ils faut zoomOut de 10%
         // souvent entre 0.5 et 1+
         // multiplié par deux
         pourcentOutHorizontal = Mathf.Abs(farestPlayerHorizontal.x);
-        pourcentOutVertical   = Mathf.Abs(farestPlayerVertical.y);
+        pourcentOutVertical = Mathf.Abs(farestPlayerVertical.y);
 
-
+        // définit la priorité horizontale ou verticale
         float zoomChange = pourcentOutHorizontal > pourcentOutVertical ? pourcentOutHorizontal : pourcentOutVertical;
-        //Debug.Log(pourcentOutHorizontal > pourcentOutVertical ? "pourcentOutHorizontal" : "pourcentOutVertical;"); // pb pas lié à cela
         zoomChange *= 2;
         zoomChange += MARGIN_ZOOM;
 
-        float newCenterToCamera = Vector3.Magnitude(myCamera.transform.position - center); // distance caméra centre actuel
+        // distance caméra centre actuel
+        float newCenterToCamera = Vector3.Magnitude(myCamera.transform.position - center);
         newCenterToCamera *= zoomChange;
 
 
         if (newCenterToCamera > MIN_DISTANCE)
         {
-            //Vector3 vec3ZoomChange = -myCamera.transform.forward * (newCenterToCamera - centerToCameraBefore); // vecteur de changement // bon
-            Vector3 vec3ZoomChange = myCamera.transform.forward * (centerToCameraBefore - newCenterToCamera); // vecteur de changement // bon
+            Vector3 vec3ZoomChange = myCamera.transform.forward * (centerToCameraBefore - newCenterToCamera); // vecteur de changement
             myCamera.transform.position += vec3ZoomChange;
-            //myCamera.transform.position = -myCamera.transform.forward * newCenterToCamera; // écrase les autres 12/04 // si draw line part n'impote où...
 
-            //Debug.DrawLine(-myCamera.transform.forward * newCenterToCamera, -myCamera.transform.forward * centerToCameraBefore); // zoomChange est bon
-            Debug.DrawLine(myCamera.transform.position, myCamera.transform.position + vec3ZoomChange); // zoomChange est bon
+            //Debug.DrawLine(myCamera.transform.position, myCamera.transform.position + vec3ZoomChange); // zoomChange est bon
         }
 
-
-
-        /* lookat unidirection Y
-        Vector3 targetPostition = new Vector3(center.x,
-                                        myCamera.transform.position.y,
-                                        center.z);
-        myCamera.transform.LookAt(targetPostition);
-        */
-
         centerToCameraBefore = newCenterToCamera;
-        centerBefore = center;
-    }
-
-    // Permet d'ajouter les players que la caméra suit par code
-    public void AddPlayer(GameObject player)
-    {
-        players.Add(player) ;
     }
 
     void updateCenter()
