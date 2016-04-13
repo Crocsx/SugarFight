@@ -81,8 +81,8 @@ public class PlayerFighter : MonoBehaviour {
 
     void StopAttack()
     {
-        currentAttack = -1;
         attacks[currentAttack].OnAttackEnd -= StopAttack;
+        currentAttack = -1;
     }
 
     public void OnDamaged(float damage, Transform player)
