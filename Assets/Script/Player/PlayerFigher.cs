@@ -90,7 +90,7 @@ public class PlayerFigher : MonoBehaviour {
         {
             isDamaged = true;
             Vector3 dir = player.transform.position - _transform.position;
-            _rigidbody.AddForce(-dir * damage * 150);
+            _rigidbody.AddForce(-dir * damage * 1000);
             OnUpdate += Damage;
         }
     }
