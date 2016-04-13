@@ -21,36 +21,34 @@ public class FightingCamera : MonoBehaviour {
     public float MIN_DISTANCE = 5;
     public float MARGIN_ZOOM = 0.25f;
     public StageManager _sManager;
-    public GameObject Stage;
+    //public GameObject Stage;
 
     Camera      myCamera;
     Transform   _transform;
     int         playersLength = 0;
     float       centerToCameraBefore = 0;
     Vector3     centerBefore;
-    Vector3     cameraPosBefore;
     Vector3     center;
+    Vector3     cameraTargetPosition;
 
     void Awake ()
     {
         _transform = transform;
-        EventManager.StartListening("OnStageStart", startSpawn);
         myCamera = _transform.GetComponent<Camera>();
-
-        players.Clear();
-        players.Add(Stage);
-
-        _sManager.OnPlayerSpawn += AddPlayer;
     }
 
     // Use this for initialization
     void Start () {
         center = Vector3.zero;
         centerBefore = Vector3.zero;
-        cameraPosBefore = _transform.position;
+        cameraTargetPosition = _transform.position;
         centerToCameraBefore = Vector3.Magnitude(_transform.position - center);
+        players.Clear();
+        //players.Add(Stage);
+        EventManager.StartListening("OnStageStart", startSpawn);
 
         myCamera.fieldOfView = ANGLE_VIEW;
+        _sManager.OnPlayerSpawn += AddPlayer;
     }
 
     void startSpawn()
@@ -66,18 +64,15 @@ public class FightingCamera : MonoBehaviour {
         playersLength = players.Count;
     }
 
-    public void RemovePlayer(GameObject player)
-    {
-        players.Remove(player);
-        playersLength = players.Count;
-    }
-
     // Update is called once per frame
     void Update () {
 
         updateCenter();
 
-        _transform.position += center - centerBefore; //duplique les mvts de la camera
+
+        cameraTargetPosition += center - centerBefore; //duplique les mvts du center pour la caméra
+        //_transform.position  += center - centerBefore; //duplique les mvts de la camera
+        _transform.position  += (cameraTargetPosition - _transform.position) / SMOOTH; // smooth tendant vers cameraTargetPosition
 
         _transform.LookAt(center); // focus centre.
 
@@ -145,14 +140,10 @@ public class FightingCamera : MonoBehaviour {
     void updateCenter()
     {
         center = Vector3.zero;
-
-        if (playersLength > 0)
+        for (int i = 0; i < playersLength; i++)
         {
-            for (int i = 0; i < playersLength; i++)
-            {
-                center += players[i].transform.position;
-            }
-            center /= playersLength;
+            center += players[i].transform.position;
         }
+        center /= playersLength;
     }
 }
