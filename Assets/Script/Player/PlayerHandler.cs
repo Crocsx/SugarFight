@@ -9,14 +9,17 @@ public class PlayerHandler : MonoBehaviour {
     public event OnDeathEvent OnDeath;
 
     // PROPERTIES -------------------------------------------------
+
+    public Transform pMaker;
+    [HideInInspector]
+    public string id;
+
     PlayerControl _pControl;
     PlayerInputs _pInputs;
     PlayerFigher _pFighter;
     Transform _transform;
 
-    [HideInInspector]
-    public string id;
-
+    Color _color;
     // INTERFACE -------------------------------------------------
 
     void Awake () {
@@ -27,8 +30,18 @@ public class PlayerHandler : MonoBehaviour {
     }
 	
 	void Update () {
-	
+        RaycastHit hit;
+	    if(Physics.Raycast(transform.position, Vector3.down, out hit)){ 
+            pMaker.transform.position = hit.point;
+        }
 	}
+
+    public void Setup(string nid, Color nColor)
+    {
+        id = nid;
+        _color = nColor;
+        pMaker.GetComponent<SpriteRenderer>().color = nColor;
+    }
 
 
     // METHODS -------------------------------------------------
