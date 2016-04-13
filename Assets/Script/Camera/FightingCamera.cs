@@ -1,4 +1,15 @@
-﻿using UnityEngine;
+﻿/* Created by Rabier Ambroise 11/04/2016
+ 
+Classe gérant la caméra, fixé par rapport à la moyenne des positions des joueurs (centre), zoom-dézoom de façon à avoir toujours les joeuurs à l'écran.
+Utiliser MARGIN_ZOOM pour augmenter la distance de la caméra de façon constante (%/2).
+Utiliser MIN_DISTANCE pour la distance minimale entre le centre et la caméra.
+Positionnez la caméra à la main dans unity, seul le zoom et le lookAt changera.
+ 
+ */
+
+
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,9 +23,9 @@ public class FightingCamera : MonoBehaviour {
     public const float ANGLE_PLONGE = 45; // degree 0 à 90
     public const float SMOOTH = 14;
     public const float MIN_DISTANCE = 5;
-    //public const float CAMERA_HEIGHT = 7;
-    //public Vector3 cameraPos = new Vector3(10,10,10);
+    public const float MARGIN_ZOOM = 0.25f;
     public Camera myCamera;
+    public StageManager _sManager;
 
     public GameObject DERBUG;
 
@@ -38,61 +49,17 @@ public class FightingCamera : MonoBehaviour {
         centerBefore = center;
         cameraPosBefore = myCamera.transform.position;
 
-        //CreateClone(center);
-
-        //myCamera.transform.Rotate(Vector3.right * ANGLE_PLONGE); redondant avec look at
-
-
+        _sManager.OnPlayerSpawn += AddPlayer;
         myCamera.transform.LookAt(center);
 
         centerToCameraBefore = Vector3.Magnitude(myCamera.transform.position - center);
 
-
-
-
-        /*
-        Vector3 p1 = players[0].transform.position; // A
-        Vector3 p2 = players[1].transform.position; // B
-        Vector3 center = (p1 + p2) / 2;             // D
-        float distance = Vector3.Distance(p1, p2); // |AB|
-        float centerToCamera = Vector3.Distance(p1, p2);
-
-        Vector3 p1ToP2 = p2 - p1; // AB
-        Vector3 h = p1ToP2;
-        h.Set(p1ToP2.x, -p1ToP2.y, p1ToP2.z);
-
-        Vector3 hUnitaire = Vector3.Normalize(h);
-        Debug.Log(hUnitaire);
-
-
-        float xAndYFromCenterToCamera = CENTER_TO_CAMERA * Mathf.Cos(ANGLE * Mathf.PI / 180); // que si 45 degrée... bof
-
-
-
-
-
-        // 11 04 2016
-        Vector3 forCamera = center;
-        Debug.Log(xAndYFromCenterToCamera);
-        forCamera.x += xAndYFromCenterToCamera; // rotation sol
-        forCamera.y += xAndYFromCenterToCamera; // hauteur
-        forCamera.z += xAndYFromCenterToCamera;
-
-
-        transform.position = forCamera;
-
-        transform.LookAt(center);
-
-        CreateClone(center);
-        */
     }
 	
 	// Update is called once per frame
 	void Update () {
 
-        // obtenir les dépassements de l'écran en % de taille du viewport
         const float HALF_CAMERA = 0.5f;
-        const float MARGIN = 0.25f;
         float pourcentOutHorizontal = 0f; 
         float pourcentOutVertical = 0f;
         Vector3 farestPlayerHorizontal = new Vector3();
@@ -101,16 +68,6 @@ public class FightingCamera : MonoBehaviour {
 
 
         updateCenter();
-        //LookTo(center, myCamera);
-
-        /*
-        float testCenter = 0;
-        for (int i = 0; i < playersLength; i++)
-        {
-            testCenter += players[i].transform.position;
-        }
-        testCenter /= playersLength;*/
-
 
         MOVEDEBUG(center);
 
@@ -120,7 +77,7 @@ public class FightingCamera : MonoBehaviour {
         myCamera.transform.LookAt(center); // focus centre.
 
 
-
+        // obtenir les dépassements de l'écran en % de taille du viewport
         for (int i = 0; i < playersLength; i++)
         {
             // calcul de la distance la plus éloigné, en vertical ainsi qu'en horizontale
@@ -152,14 +109,9 @@ public class FightingCamera : MonoBehaviour {
         float zoomChange = pourcentOutHorizontal > pourcentOutVertical ? pourcentOutHorizontal : pourcentOutVertical;
         //Debug.Log(pourcentOutHorizontal > pourcentOutVertical ? "pourcentOutHorizontal" : "pourcentOutVertical;"); // pb pas lié à cela
         zoomChange *= 2;
-        zoomChange += MARGIN;
+        zoomChange += MARGIN_ZOOM;
 
-        //Debug.Log(pourcentOutHorizontal); // 0 
         float newCenterToCamera = Vector3.Magnitude(myCamera.transform.position - center); // distance caméra centre actuel
-        //Vector3 unitaireCenterToCamera = Vector3.Normalize(myCamera.transform.position - center);
-        //Debug.Log(centerToCamera);
-        //Debug.Log(zoomChange);
-        //Debug.Log(newCenterToCamera);
         newCenterToCamera *= zoomChange;
 
 
@@ -183,58 +135,14 @@ public class FightingCamera : MonoBehaviour {
         myCamera.transform.LookAt(targetPostition);
         */
 
-
-
-
-
-
-
-        /*
-         
-      float newAngle = 0f;
-
-
-
-
-
-
-      // 45 DEGREE uniquement (sinon cos et sinus à utiliser)
-      // distance au sol entre camera et centre
-      float temp = newCenterToCamera * Mathf.Cos((ANGLE_PLONGE * Mathf.PI) / 180);
-
-      Vector3 newVec3 = new Vector3(temp * Mathf.Sin(newAngle), temp, temp * Mathf.Cos(newAngle));
-
-      // rotation y seulement, z = 45, x = 0;
-      // translation x et z et y
-
-
-      // centerToCamera à plat, et lui faire un rotate around
-      ////myCamera.transform.position = unitaireCenterToCamera * newCenterToCamera; // a plat
-      ////myCamera.transform.RotateAround(center, Vector3.forward, ANGLE_PLONGE); // ANGLE_PLONGE
-
-
-      //Vector3 newVec3 = new Vector3(temp, temp, myCamera.transform.position.z);
-
-      newVec3 += (centerBefore - center);
-      myCamera.transform.position += (newVec3 - myCamera.transform.position) / SMOOTH; // newPos
-
-      // si deux players je tourne autour en prenant la perpendiculaire, sinon rien.
-      // càd vector 3 normalize pour avoir l'angle en y, aplliqué ensuite à la distance x et z de la caméra.
-      if (playersLength == 2)
-      {
-
-      }
-      // temp camera tourne tout seule.
-      //myCamera.transform.RotateAround(center, Vector3.up, 20 * Time.deltaTime);
-
-      // vérification (debug)
-      for (int i = 0; i < playersLength; i++)
-      {
-          //Debug.Log(isVisible(players[i].transform.position));
-      }
-      */
         centerToCameraBefore = newCenterToCamera;
         centerBefore = center;
+    }
+
+    // Permet d'ajouter les players que la caméra suit par code
+    public void AddPlayer(GameObject player)
+    {
+        players.Add(player) ;
     }
 
     void updateCenter()
@@ -247,7 +155,12 @@ public class FightingCamera : MonoBehaviour {
         center /= playersLength;
     }
 
+    void MOVEDEBUG(Vector3 posa)
+    {
+        DERBUG.transform.position = posa;
+    }
 
+    /*
     bool isVisible(Vector3 target)
     {
         Vector3 screenPoint = myCamera.WorldToViewportPoint(target);
@@ -265,17 +178,13 @@ public class FightingCamera : MonoBehaviour {
         clone = Instantiate(players[0].transform,
                             myPosition,
                             players[0].transform.rotation) as GameObject;
-    }
+    }*/
 
-    void MOVEDEBUG(Vector3 posa)
-    {
-        DERBUG.transform.position = posa;
-    }
-
+    /* idem que lookat
     void LookTo(Vector3 pTarget, Camera pCamera)
     {
         Vector3 relativePos = pTarget - pCamera.transform.position;
         Quaternion rotation = Quaternion.LookRotation(relativePos);
         pCamera.transform.rotation = rotation;
-    }
+    }*/
 }
