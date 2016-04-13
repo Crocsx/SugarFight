@@ -11,6 +11,7 @@ public class PlayerHandler : MonoBehaviour {
     // PROPERTIES -------------------------------------------------
     PlayerControl _pControl;
     PlayerInputs _pInputs;
+    PlayerFigher _pFighter;
     Transform _transform;
 
     [HideInInspector]
@@ -22,6 +23,7 @@ public class PlayerHandler : MonoBehaviour {
         _transform = transform;
         _pControl = _transform.GetComponent<PlayerControl>();
         _pInputs = _transform.GetComponent<PlayerInputs>();
+        _pFighter = _transform.GetComponent<PlayerFigher>();
     }
 	
 	void Update () {
@@ -42,6 +44,7 @@ public class PlayerHandler : MonoBehaviour {
         _transform.GetComponent<Rigidbody>().isKinematic = true;
         _pControl.Reset();
         _pControl.enabled = false;
+        _pInputs.enabled = false;
     }
 
     public void Enable()
@@ -49,5 +52,6 @@ public class PlayerHandler : MonoBehaviour {
         _transform.GetComponent<Rigidbody>().isKinematic = false;
         _pControl.Reset();
         _pControl.enabled = true;
+        _pInputs.enabled = true;
     }
 }
