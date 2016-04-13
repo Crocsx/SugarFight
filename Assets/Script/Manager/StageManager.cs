@@ -6,6 +6,9 @@ public class StageManager : MonoBehaviour {
 
     // EVENTS -----------------------------------------------------
 
+    public delegate void OnPlayerSpawnDelegate(GameObject player);
+    public event OnPlayerSpawnDelegate OnPlayerSpawn;
+
     // PROPERTIES --------------------------------------------------------
 
     public int nbPlayer = 2;
@@ -37,6 +40,10 @@ public class StageManager : MonoBehaviour {
         nPlayer.GetComponent<PlayerHandler>().id = name;
         nPlayer.GetComponent<PlayerHandler>().OnDeath += PlayerDead;
         lifeRemaining.Add(name, nbLife);
+
+        if (OnPlayerSpawn != null)
+            OnPlayerSpawn(nPlayer);
+
         return nPlayer;
     }
 	void Update () {
