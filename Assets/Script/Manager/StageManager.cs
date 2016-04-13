@@ -23,7 +23,7 @@ public class StageManager : MonoBehaviour {
         for (var i =0; i < nbPlayer; i++)
         {
             Respawner _respawner = FindAvailableRespawner();
-            GameObject nPlayer = SpawnPlayer(playerPrefab, ("Player"+ i));
+            GameObject nPlayer = SpawnPlayer(playerPrefab, ("Player"+ (i+1)));
             _respawner.AddPlayer(nPlayer.transform);
         }
 
@@ -33,8 +33,9 @@ public class StageManager : MonoBehaviour {
     GameObject SpawnPlayer(GameObject prefab, string name)
     {
         GameObject nPlayer = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-        nPlayer.GetComponent<PlayerController>().id = name;
-        nPlayer.GetComponent<PlayerController>().OnDeath += PlayerDead;
+        nPlayer.name = name;
+        nPlayer.GetComponent<PlayerHandler>().id = name;
+        nPlayer.GetComponent<PlayerHandler>().OnDeath += PlayerDead;
         lifeRemaining.Add(name, nbLife);
         return nPlayer;
     }

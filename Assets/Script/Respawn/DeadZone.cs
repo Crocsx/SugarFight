@@ -8,6 +8,6 @@ public class DeadZone : MonoBehaviour {
         Transform _entity = other.transform;
 
         if (_entity.CompareTag("Player"))
-            _entity.GetComponent<PlayerController>().askDie();
+            _entity.GetComponent<PlayerHandler>().askDie();
     }
 }
