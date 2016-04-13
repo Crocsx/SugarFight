@@ -4,24 +4,28 @@ using System.Collections;
 [System.Serializable]
 public class Attack : MonoBehaviour, iAttack
 {
-    public DamageHitbox script;
-    public float pushDamage;
-
+    public float attackRecovery = 0.3f;
     public string animName;
+
     [HideInInspector]
     public float attackTimer;
     [HideInInspector]
     public int timePressed;
     [HideInInspector]
-    public float attackRate = 0.3f;
-    [HideInInspector]
     public event onAttackEnd OnAttackEnd;
+    [HideInInspector]
+    public bool isAttackPlaying;
 
-    protected bool isAttackPlaying;
+    protected Transform _owner;
 
     public virtual void OnUpdate()
     {
 
+    }
+
+    public virtual void Setup(Transform owner)
+    {
+        _owner = owner;
     }
 
     public virtual void Start()
@@ -36,4 +40,10 @@ public class Attack : MonoBehaviour, iAttack
         isAttackPlaying = false;
         OnAttackEnd();
     }
+
+    public virtual void Interrupt()
+    {
+
+    }
+
 }

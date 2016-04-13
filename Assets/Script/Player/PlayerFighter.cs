@@ -58,7 +58,7 @@ public class PlayerFighter : MonoBehaviour {
 
         for (var i = 0; i < attacks.Length; i++)
         {
-            attacks[i].script.Setup(attacks[i], _transform);
+            attacks[i].Setup(_transform);
         }
     }
 
@@ -70,17 +70,28 @@ public class PlayerFighter : MonoBehaviour {
 
     public void onAttack(int value)
     {
-        if (currentAttack != -1)
+        if (currentAttack != -1 && attacks[currentAttack].isAttackPlaying)
             return;
 
+        _pControl.disableMovement = true;
         currentAttack = value;
         attacks[currentAttack].Start();
         OnUpdate += attacks[currentAttack].OnUpdate;
         attacks[currentAttack].OnAttackEnd += StopAttack;
     }
 
+    public void askStopAttack(int value)
+    {
+        if (attacks[value].isAttackPlaying)
+        {
+            attacks[value].Interrupt();
+        }
+    }
+
     void StopAttack()
     {
+        _pControl.disableMovement = false;
+        OnUpdate -= attacks[currentAttack].OnUpdate;
         attacks[currentAttack].OnAttackEnd -= StopAttack;
         currentAttack = -1;
     }
@@ -110,7 +121,7 @@ public class PlayerFighter : MonoBehaviour {
 
     void Damage()
     {
-        noDamageTimer += Time.fixedDeltaTime;
+        noDamageTimer += Time.deltaTime;
         if (noDamageTimer > TimeInvulnerable)
         {
             isDamaged = false;

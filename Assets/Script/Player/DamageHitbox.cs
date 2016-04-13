@@ -6,9 +6,9 @@ public class DamageHitbox : MonoBehaviour {
     Transform owner;
     float _damage;
 
-    public void Setup (Attack _attack, Transform _owner) {
+    public void Setup (float dmg, Transform _owner) {
         owner = _owner;
-        _damage = _attack.pushDamage;
+        _damage = dmg;
     }
 	
 	// Update is called once per frame
