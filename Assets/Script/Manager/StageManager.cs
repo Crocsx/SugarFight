@@ -31,7 +31,15 @@ public class StageManager : MonoBehaviour {
             _respawner.AddPlayer(nPlayer.transform);
         }
 
+        EventManager.StartListening("OnPause", Pause);
+
         EventManager.TriggerEvent("OnStageStart");
+    }
+
+    void Pause()
+    {
+        Debug.Log("Pause");
+        Time.timeScale = 0;
     }
 
     GameObject SpawnPlayer(GameObject prefab, string name, Color color)
@@ -49,9 +57,6 @@ public class StageManager : MonoBehaviour {
 
         return nPlayer;
     }
-	void Update () {
-	
-	}
 
     void PlayerDead (string pName, Transform transform)
     {

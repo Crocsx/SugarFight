@@ -98,6 +98,11 @@ public class PlayerControl : MonoBehaviour
         {
             OnEnterGround();
         }
+        if (collision.collider.CompareTag("Player"))
+        {
+            _rigidbody.velocity = new Vector3(0, _rigidbody.velocity.y, 0);
+
+        }
     }
 
     void OnCollisionExit(Collision collision)

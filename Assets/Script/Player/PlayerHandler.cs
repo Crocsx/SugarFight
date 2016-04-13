@@ -16,7 +16,7 @@ public class PlayerHandler : MonoBehaviour {
 
     PlayerControl _pControl;
     PlayerInputs _pInputs;
-    PlayerFigher _pFighter;
+    PlayerFighter _pFighter;
     Transform _transform;
 
     Color _color;
@@ -26,7 +26,7 @@ public class PlayerHandler : MonoBehaviour {
         _transform = transform;
         _pControl = _transform.GetComponent<PlayerControl>();
         _pInputs = _transform.GetComponent<PlayerInputs>();
-        _pFighter = _transform.GetComponent<PlayerFigher>();
+        _pFighter = _transform.GetComponent<PlayerFighter>();
     }
 	
 	void Update () {

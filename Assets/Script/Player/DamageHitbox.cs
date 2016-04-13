@@ -20,7 +20,7 @@ public class DamageHitbox : MonoBehaviour {
     {
         if (collider.CompareTag("Player") && collider != owner)
         {
-            collider.GetComponent<PlayerFigher>().OnDamaged(_damage, owner);
+            collider.GetComponent<PlayerFighter>().OnDamaged(_damage, owner);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerFigher : MonoBehaviour {
+public class PlayerFighter : MonoBehaviour {
 
     public delegate void onUpdate();
     public onUpdate OnUpdate;
