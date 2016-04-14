@@ -188,19 +188,12 @@ public class PlayerControl : MonoBehaviour
         OnFixedUpdate += Fall;
     }
 
-    void ScaleCheck(Vector3 axis)
+    public void ScaleCheck(Vector3 axis)
     {
         if (axis.x < 0)
             _transform.localScale = new Vector3(1, 1, 1);
         else if (axis.x > 0)
             _transform.localScale = new Vector3(-1, 1, 1);
-
-        if (axis.y < 0) 
-            transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y - 45, _initRotation.z);
-        else if (axis.y > 0)
-            transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y + 45, _initRotation.z);
-        else if(axis.y == 0.0f)
-            transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y, _initRotation.z);
     }
 
     public void Reset()

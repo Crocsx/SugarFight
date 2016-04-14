@@ -45,5 +45,4 @@ public class Attack : MonoBehaviour, iAttack
     {
 
     }
-
 }
