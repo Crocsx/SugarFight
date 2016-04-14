@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Rewired;
 
 public class PlayerInputs : MonoBehaviour {
 
@@ -9,14 +10,11 @@ public class PlayerInputs : MonoBehaviour {
     PlayerControl       _pController;
     PlayerFighter        _pFighter;
     PlayerHandler       _pHandler;
-    Vector2             _currAxis;
 
-    bool _blockButton;
-    bool blockButton
-    {
-        get { return _blockButton; }
-        set { _blockButton = value; _pFighter.Block(value);}
-    }
+    [HideInInspector]
+    public Vector2      _currAxis;
+
+    Player              _player;
 
     // INTERFACE -----------------------------------------------------
 
@@ -26,6 +24,7 @@ public class PlayerInputs : MonoBehaviour {
         _pController = _transform.GetComponent<PlayerControl>();
         _pFighter = _transform.GetComponent<PlayerFighter>();
         _pHandler = _transform.GetComponent<PlayerHandler>();
+        _player = ReInput.players.GetPlayer(_pHandler.id);
     }
 	
 
@@ -40,39 +39,44 @@ public class PlayerInputs : MonoBehaviour {
 
     void CheckAxis()
     {
-        _currAxis.x = Input.GetAxis(_pHandler.id + "_Vertical");
-        _currAxis.y = Input.GetAxis(_pHandler.id + "_Horizontal");
-
-        if ((Input.GetAxis(_pHandler.id + "_Block") > 0) && !_blockButton)
-            blockButton = true;
-        if ((Input.GetAxis(_pHandler.id + "_Block") <= 0) && _blockButton)
-            blockButton = false;
+        _currAxis.x = _player.GetAxis("Vertical");
+        _currAxis.y = _player.GetAxis("Horizontal");
     }
 
     void CheckInputs()
     {
-        _currAxis.x = Input.GetAxis(_pHandler.id + "_Vertical");
-        _currAxis.y = Input.GetAxis(_pHandler.id + "_Horizontal");
 
-        if(Input.GetButtonDown(_pHandler.id + "_Jump"))
+        if(_player.GetButtonDown("Jump"))
             _pController.onJump();
 
-        if (Input.GetButtonDown(_pHandler.id + "_Fire1"))
+        if (_player.GetButtonDown("Fire1"))
             _pFighter.onAttack(0);
-        if (Input.GetButtonUp(_pHandler.id + "_Fire1"))
+        if (_player.GetButtonUp("Fire1"))
             _pFighter.askStopAttack(0);
 
-        if (Input.GetButtonDown(_pHandler.id + "_Fire2"))
+        if (_player.GetButtonDown("Fire2"))
             _pFighter.onAttack(1);
-        if (Input.GetButtonUp(_pHandler.id + "_Fire2"))
+        if (_player.GetButtonUp("Fire2"))
             _pFighter.askStopAttack(1);
 
-        if (Input.GetButtonDown(_pHandler.id + "_Fire3"))
+        if (_player.GetButtonDown("Fire3"))
             _pFighter.onAttack(3); 
-        if (Input.GetButtonUp(_pHandler.id + "_Fire3"))
+        if (_player.GetButtonUp("Fire3"))
             _pFighter.askStopAttack(3);
 
-        if (Input.GetButtonDown(_pHandler.id + "_Start"))
+        if (_player.GetButtonDown("Block"))
+            _pFighter.Block(true);
+        if (_player.GetButtonUp("Block"))
+            _pFighter.Block(false);
+
+        if (_player.GetButtonDown("Dash"))
+            _pFighter.onAttack(4);
+        if (_player.GetButtonUp("Dash"))
+            _pFighter.askStopAttack(4);
+        
+        if (Input.GetButtonDown("Start"))
             EventManager.TriggerEvent("OnPause");
+        if (Input.GetButtonUp("Start"))
+            EventManager.TriggerEvent("UnPause");
     }
 }
