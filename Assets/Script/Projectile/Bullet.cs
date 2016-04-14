@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour {
         _lifeTime = ratio * maxLifeTime;
         _speed = ratio * maxSpeed;
         _dmg = ratio * maxDamage;
-        _dir = Vector3.Scale(_launcher.right, launcher.localScale);
+        _dir = Vector3.Scale(-_launcher.right, launcher.localScale);
     }
 	// Update is called once per frame
 	void Update () {

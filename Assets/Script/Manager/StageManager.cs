@@ -19,7 +19,7 @@ public class StageManager : MonoBehaviour {
     public Dictionary<string, int> lifeRemaining = new Dictionary<string, int>();
 
 
-    Color[] PlayerColor = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.grey, Color.black };
+    public Color[] PlayerColor = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.grey, Color.black };
     // INTERFACE -----------------------------------------------------
 
     void Start ()

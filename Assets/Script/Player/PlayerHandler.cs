@@ -13,16 +13,14 @@ public class PlayerHandler : MonoBehaviour {
     public Transform pMaker;
     [HideInInspector]
     public int id;
-    [HideInInspector]
-    public string name;
 
     PlayerControl _pControl;
     PlayerInputs _pInputs;
     PlayerFighter _pFighter;
     Transform _transform;
 
-    Quaternion _initRot;
-    Color _color;
+    [HideInInspector]
+    public Color _color;
     // INTERFACE -------------------------------------------------
 
     void Awake () {
@@ -30,13 +28,11 @@ public class PlayerHandler : MonoBehaviour {
         _pControl = _transform.GetComponent<PlayerControl>();
         _pInputs = _transform.GetComponent<PlayerInputs>();
         _pFighter = _transform.GetComponent<PlayerFighter>();
-        _initRot = pMaker.rotation;
     }
 	
 	void Update () {
         RaycastHit hit;
 	    if(Physics.Raycast(transform.position + new Vector3(0, 0.1f, 0), Vector3.down, out hit)){
-            pMaker.transform.rotation = _initRot * hit.transform.rotation;
             pMaker.transform.position = hit.point + new Vector3(0,0.1f,0);
         }
 	}
