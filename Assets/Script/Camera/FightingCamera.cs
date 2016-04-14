@@ -24,6 +24,7 @@ public class FightingCamera : MonoBehaviour {
     public float MAX_DISTANCE_PLAYER_TO_STAGE = 15;
     public StageManager _sManager;
     public GameObject stage;
+    public bool active;
 
     Camera      myCamera;
     Transform   _transform;
@@ -37,9 +38,8 @@ public class FightingCamera : MonoBehaviour {
     {
         _transform = transform;
         myCamera = _transform.GetComponent<Camera>();
-
+        active = false;
         players.Clear();
-        //players.Add(stage);
 
         EventManager.StartListening("OnStageStart", startSpawn);
 
@@ -71,7 +71,8 @@ public class FightingCamera : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-
+        if (!active)
+            return;
         updateCenter();
         /* pas la solution idéale
         if (DistanceMaxPlayers() > MAX_DISTANCE_BETWEEN_PLAYERS)
