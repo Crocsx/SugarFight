@@ -24,15 +24,19 @@ public class StageManager : MonoBehaviour {
 
     void Start ()
     {
-        for (var i =0; i < nbPlayer; i++)
+        EventManager.StartListening("OnPause", Pause);
+        EventManager.StartListening("UnPause", unPause);
+        EventManager.StartListening("OnCinematicFinished", SpawnPlayers);
+    }
+
+    void SpawnPlayers()
+    {
+        for (var i = 0; i < nbPlayer; i++)
         {
             Respawner _respawner = FindAvailableRespawner();
             GameObject nPlayer = SpawnPlayer(playerPrefab, i, PlayerColor[i]);
             _respawner.AddPlayer(nPlayer.transform);
         }
-
-        EventManager.StartListening("OnPause", Pause);
-        EventManager.StartListening("UnPause", unPause);
 
         EventManager.TriggerEvent("OnStageStart");
     }
