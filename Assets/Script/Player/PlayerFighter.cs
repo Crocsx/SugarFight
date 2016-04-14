@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerFigher : MonoBehaviour {
+public class PlayerFighter : MonoBehaviour {
 
     public delegate void onUpdate();
     public onUpdate OnUpdate;
 
     [Header("FIGHT PARAMS")]
-    public float attackRate = 0.3f;
+
     public float TimeInvulnerable = 1.0f;
     float noDamageTimer = 0;
     public Attack[] attacks = new Attack[2];
@@ -58,7 +58,7 @@ public class PlayerFigher : MonoBehaviour {
 
         for (var i = 0; i < attacks.Length; i++)
         {
-            attacks[i].script.Setup(attacks[i], _transform);
+            attacks[i].Setup(_transform);
         }
     }
 
@@ -70,17 +70,29 @@ public class PlayerFigher : MonoBehaviour {
 
     public void onAttack(int value)
     {
+        if (currentAttack != -1 && attacks[currentAttack].isAttackPlaying)
+            return;
+
+        _pControl.disableMovement = true;
         currentAttack = value;
-        OnUpdate += Attack;
+        attacks[currentAttack].Start();
+        OnUpdate += attacks[currentAttack].OnUpdate;
+        attacks[currentAttack].OnAttackEnd += StopAttack;
+    }
+
+    public void askStopAttack(int value)
+    {
+        if (attacks[value].isAttackPlaying)
+        {
+            attacks[value].Interrupt();
+        }
     }
 
     void StopAttack()
     {
-        OnUpdate -= Attack;
-
-        attacks[currentAttack].attack = false;
-        attacks[currentAttack].attackTimer = 0;
-        attacks[currentAttack].timePressed = 0;
+        _pControl.disableMovement = false;
+        OnUpdate -= attacks[currentAttack].OnUpdate;
+        attacks[currentAttack].OnAttackEnd -= StopAttack;
         currentAttack = -1;
     }
 
@@ -107,26 +119,9 @@ public class PlayerFigher : MonoBehaviour {
         isBlocking = value;
     }
 
-
-    void Attack()
-    {
-        attacks[currentAttack].attack = true;
-        attacks[currentAttack].attackTimer = 0;
-        attacks[currentAttack].timePressed++;
-        if (attacks[currentAttack].attack)
-        {
-            attacks[currentAttack].attackTimer += Time.fixedDeltaTime;
-
-            if (attacks[currentAttack].attackTimer > attackRate || attacks[currentAttack].timePressed >= 4)
-            {
-                StopAttack();
-            }
-        }
-    }
-
     void Damage()
     {
-        noDamageTimer += Time.fixedDeltaTime;
+        noDamageTimer += Time.deltaTime;
         if (noDamageTimer > TimeInvulnerable)
         {
             isDamaged = false;

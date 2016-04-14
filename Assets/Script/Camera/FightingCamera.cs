@@ -38,6 +38,7 @@ public class FightingCamera : MonoBehaviour {
 
         players.Clear();
         players.Add(stage);
+
         EventManager.StartListening("OnStageStart", startSpawn);
 
         _sManager.OnPlayerSpawn += AddPlayer;

@@ -7,7 +7,7 @@ public class PlayerInputs : MonoBehaviour {
 
     Transform           _transform;
     PlayerControl       _pController;
-    PlayerFigher        _pFighter;
+    PlayerFighter        _pFighter;
     PlayerHandler       _pHandler;
     Vector2             _currAxis;
 
@@ -24,7 +24,7 @@ public class PlayerInputs : MonoBehaviour {
     {
         _transform = transform;
         _pController = _transform.GetComponent<PlayerControl>();
-        _pFighter = _transform.GetComponent<PlayerFigher>();
+        _pFighter = _transform.GetComponent<PlayerFighter>();
         _pHandler = _transform.GetComponent<PlayerHandler>();
     }
 	
@@ -59,8 +59,20 @@ public class PlayerInputs : MonoBehaviour {
 
         if (Input.GetButtonDown(_pHandler.id + "_Fire1"))
             _pFighter.onAttack(0);
-        
+        if (Input.GetButtonUp(_pHandler.id + "_Fire1"))
+            _pFighter.askStopAttack(0);
+
         if (Input.GetButtonDown(_pHandler.id + "_Fire2"))
             _pFighter.onAttack(1);
+        if (Input.GetButtonUp(_pHandler.id + "_Fire2"))
+            _pFighter.askStopAttack(1);
+
+        if (Input.GetButtonDown(_pHandler.id + "_Fire3"))
+            _pFighter.onAttack(3); 
+        if (Input.GetButtonUp(_pHandler.id + "_Fire3"))
+            _pFighter.askStopAttack(3);
+
+        if (Input.GetButtonDown(_pHandler.id + "_Start"))
+            EventManager.TriggerEvent("OnPause");
     }
 }

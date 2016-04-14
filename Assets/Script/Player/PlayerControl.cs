@@ -28,6 +28,9 @@ public class PlayerControl : MonoBehaviour
     Transform _transform;
     Vector3 _initRotation;
 
+    [HideInInspector]
+    public bool disableMovement = false;
+
     bool _isInvulnerable = false;
     bool isInvulnerable
     {
@@ -98,6 +101,11 @@ public class PlayerControl : MonoBehaviour
         {
             OnEnterGround();
         }
+        if (collision.collider.CompareTag("Player"))
+        {
+            _rigidbody.velocity = new Vector3(0, _rigidbody.velocity.y, 0);
+
+        }
     }
 
     void OnCollisionExit(Collision collision)
@@ -143,6 +151,9 @@ public class PlayerControl : MonoBehaviour
 
     public void Move()
     {
+        if (disableMovement)
+            return;
+
         ScaleCheck(_movement);
         _rigidbody.AddForce(_movement * moveSpeed * Time.fixedDeltaTime * 1000);
     }
@@ -200,12 +211,18 @@ public class PlayerControl : MonoBehaviour
 
     public void ReduceSpeed(float slow)
     {
-        moveSpeed = moveSpeed * (1 - slow);
+        if (slow == 1)
+            disableMovement = true;
+        else
+            moveSpeed = moveSpeed * (1 - slow);
     }
 
     public void AugmentSpeed(float boost)
     {
-        moveSpeed = moveSpeed / (1 - boost);
+        if (boost == 1)
+            disableMovement = false;
+        else
+            moveSpeed = moveSpeed / (1 - boost);
     }
 
     bool isOnGround()
