@@ -49,11 +49,12 @@ public class MenuManager : MonoBehaviour {
     {
         Vector3 startPosition = bgClickToPlay.transform.position;
         Vector3 endPosition = startPosition + new Vector3(250, 0, 0);
+        float duration = 0.5f;
         float elapsedTime = 0;
 
         while (elapsedTime < 1)
         {
-            bgClickToPlay.transform.position = Vector3.Lerp(startPosition, endPosition, elapsedTime / 1);
+            bgClickToPlay.transform.position = Vector3.Lerp(startPosition, endPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
@@ -63,5 +64,30 @@ public class MenuManager : MonoBehaviour {
         btnRules.SetActive(true);
         btnOptions.SetActive(true);
         btnCredits.SetActive(true);
+
+        Vector3 startPositionPlayBtn = btnPlay.transform.position;
+        Vector3 endPositionPlayBtn = startPositionPlayBtn + new Vector3(250, 0, 0);
+
+        Vector3 startPositionRulesBtn = btnRules.transform.position;
+        Vector3 endPositionRulesBtn = startPositionRulesBtn + new Vector3(-250, 0, 0);
+
+        Vector3 startPositionOptionBtn = btnOptions.transform.position;
+        Vector3 endPositionOptionBtn = startPositionOptionBtn + new Vector3(250, 0, 0);
+
+        Vector3 startPositionCreditsBtn = btnCredits.transform.position;
+        Vector3 endPositionCreditsBtn = startPositionCreditsBtn + new Vector3(-250, 0, 0);
+
+        elapsedTime = 0;
+
+        while (elapsedTime < duration)
+        {
+            btnPlay.transform.position = Vector3.Lerp(startPositionPlayBtn, endPositionPlayBtn, elapsedTime / duration);
+            btnRules.transform.position = Vector3.Lerp(startPositionRulesBtn, endPositionRulesBtn, elapsedTime / duration);
+            btnOptions.transform.position = Vector3.Lerp(startPositionOptionBtn, endPositionOptionBtn, elapsedTime / duration);
+            btnCredits.transform.position = Vector3.Lerp(startPositionCreditsBtn, endPositionCreditsBtn, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
     }
 }
