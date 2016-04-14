@@ -7,16 +7,16 @@ public class Attack_Distance : Attack {
     public float timeCharge;
 
     bool _spawned;
+    float _ratio;
 
     public override void OnUpdate()
     {
         if (isAttackPlaying)
         {
-            if(!_spawned && attackTimer > timeCharge)
+            _ratio += Time.deltaTime;
+            if (!_spawned && attackTimer > timeCharge)
             {
-                GameObject pjt = Instantiate(Projectile, _owner.position - Vector3.Scale(_owner.right, _owner.localScale), Quaternion.identity) as GameObject;
-                pjt.transform.GetComponent<Bullet>().launcher = _owner;
-                _spawned = true;
+                Spawn();
             }
             if (attackTimer > attackRecovery)
             {
@@ -25,14 +25,23 @@ public class Attack_Distance : Attack {
             attackTimer += Time.deltaTime;
         }
     }
+    void Spawn()
+    {
+        GameObject pjt = Instantiate(Projectile, _owner.position + (Vector3.Scale(_owner.right, _owner.localScale)* 2), Quaternion.identity) as GameObject;
+        pjt.transform.GetComponent<Bullet>().Launch(_owner, (_ratio / timeCharge));
+        _spawned = true;
+        attackTimer = timeCharge;
+    }
 
     public override void Interrupt()
     {
-        Stop();
+        if(!_spawned)
+            Spawn();
     }
 
     public override void Start()
     {
+        _ratio = 0;
         _spawned = false;
         attackTimer = 0;
         base.Start();
@@ -40,7 +49,8 @@ public class Attack_Distance : Attack {
 
     public override void Stop()
     {
-        _spawned = true;
+        _ratio = 0;
+        _spawned = false;
         attackTimer = 0;
         base.Stop();
     }

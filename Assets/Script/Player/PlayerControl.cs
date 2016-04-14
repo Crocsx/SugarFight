@@ -32,35 +32,35 @@ public class PlayerControl : MonoBehaviour
     public bool disableMovement = false;
 
     bool _isInvulnerable = false;
-    bool isInvulnerable
+    public bool isInvulnerable
     {
         get { return _isInvulnerable; }
         set { _isInvulnerable = value; }
     }
 
     bool _isJumping;
-    bool isJumping
+    public bool isJumping
     {
         get { return _isJumping; }
         set { _isJumping = value; }
     }
 
     bool _isGrounded;
-    bool isGrounded
+    public bool isGrounded
     {
         get { return _isGrounded; }
         set { _isGrounded = value; _animator.SetBool("OnGround", value); }
     }
 
     Vector3 _movement;
-    Vector3 movement
+    public Vector3 movement
     {
         get { return _movement; }
         set { _movement = value; _animator.SetFloat("Movement", value.magnitude); }
     }
 
     bool _isFalling;
-    bool isFalling
+    public bool isFalling
     {
         get { return _isFalling; }
         set { _isFalling = value; _animator.SetBool("isFalling", value); }
@@ -188,19 +188,12 @@ public class PlayerControl : MonoBehaviour
         OnFixedUpdate += Fall;
     }
 
-    void ScaleCheck(Vector3 axis)
+    public void ScaleCheck(Vector3 axis)
     {
         if (axis.x < 0)
-            _transform.localScale = new Vector3(1, 1, 1);
-        else if (axis.x > 0)
             _transform.localScale = new Vector3(-1, 1, 1);
-
-        if (axis.y < 0) 
-            transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y - 45, _initRotation.z);
-        else if (axis.y > 0)
-            transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y + 45, _initRotation.z);
-        else if(axis.y == 0.0f)
-            transform.rotation = Quaternion.Euler(_initRotation.x, _initRotation.y, _initRotation.z);
+        else if (axis.x > 0)
+            _transform.localScale = new Vector3(1, 1, 1);
     }
 
     public void Reset()

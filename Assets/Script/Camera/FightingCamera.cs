@@ -20,6 +20,8 @@ public class FightingCamera : MonoBehaviour {
     public float SMOOTH = 14;
     public float MIN_DISTANCE = 5;
     public float MARGIN_ZOOM = 0.25f;
+    //public float MAX_DISTANCE_BETWEEN_PLAYERS = 20;
+    public float MAX_DISTANCE_PLAYER_TO_STAGE = 15;
     public StageManager _sManager;
     public GameObject stage;
 
@@ -37,7 +39,7 @@ public class FightingCamera : MonoBehaviour {
         myCamera = _transform.GetComponent<Camera>();
 
         players.Clear();
-        players.Add(stage);
+        //players.Add(stage);
 
         EventManager.StartListening("OnStageStart", startSpawn);
 
@@ -71,7 +73,11 @@ public class FightingCamera : MonoBehaviour {
     void Update () {
 
         updateCenter();
-
+        /* pas la solution idéale
+        if (DistanceMaxPlayers() > MAX_DISTANCE_BETWEEN_PLAYERS)
+        {
+            return;
+        }*/
 
         cameraTargetPosition += center - centerBefore; //duplique les mvts du center pour la caméra
         //_transform.position  += center - centerBefore; //duplique les mvts de la camera
@@ -101,6 +107,7 @@ public class FightingCamera : MonoBehaviour {
             Vector3 distance = myCamera.WorldToViewportPoint(players[i].transform.position);
             distance -= new Vector3(HALF_CAMERA, HALF_CAMERA, -distance.z); // position à partir du centre de l'écran
 
+            if (distance.z > 0) return; // au cas où un joueur passe derrière la caméra (interdit), possible que si un joueur est trop éloigné du stage.
 
             if (Mathf.Abs(distance.x) > Mathf.Abs(farestPlayerHorizontal.x))
             {
@@ -143,13 +150,38 @@ public class FightingCamera : MonoBehaviour {
     void updateCenter()
     {
         center = Vector3.zero;
+        float skippedPlayers = 0f;
+
         if(playersLength > 0)
         {
             for (int i = 0; i < playersLength; i++)
             {
+                if (Vector3.Magnitude(players[i].transform.position - stage.transform.position) > MAX_DISTANCE_PLAYER_TO_STAGE)
+                {
+                    skippedPlayers++;
+                    continue;
+                }
                 center += players[i].transform.position;
             }
-            center /= playersLength;
+            center /= playersLength - skippedPlayers;
         }
     }
+    /* pas la solution idéale (freeze la caméra si distance max entre joueurs....
+    float DistanceMaxPlayers()
+    {
+        float maxDistance = 0f;
+
+        for (int i = 0; i < playersLength; i++)
+        {
+            for (int u = 0; u < playersLength; u++)
+            {
+                float distanceBetweenPlayers = Vector3.Magnitude(players[i].transform.position - players[u].transform.position);
+                if (distanceBetweenPlayers > maxDistance)
+                {
+                    maxDistance = distanceBetweenPlayers;
+                }
+            }
+        }
+            return maxDistance;
+    }*/
 }

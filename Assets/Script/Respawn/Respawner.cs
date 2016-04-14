@@ -9,6 +9,7 @@ public class Respawner : MonoBehaviour {
 
     // PROPERTIES -----------------------------------------------------
 
+    public Transform ballon;
     Transform   _transform;
     Transform   _playerRef;
     Vector3     _sPosition;
@@ -25,6 +26,7 @@ public class Respawner : MonoBehaviour {
     {
         _transform = transform;
         _sPosition = _transform.position;
+        ballon.gameObject.SetActive(false);
         EventManager.StartListening("OnStageStart", startSpawn);
     }
 
@@ -50,9 +52,16 @@ public class Respawner : MonoBehaviour {
 
     public void AttachPlayer()
     {
+        ballon.gameObject.SetActive(true);
         _playerRef.GetComponent<PlayerHandler>().Disable();
+
+        // SALE
+        _playerRef.GetComponent<PlayerControl>().ScaleCheck(-ballon.transform.position);
+
+        ballon.GetComponent<SpriteRenderer>().color = _playerRef.GetComponent<PlayerHandler>()._color;
         _playerRef.position = transform.position;
         _playerRef.parent = _transform;
+
         isAvailable = false;
     }
 
@@ -61,6 +70,7 @@ public class Respawner : MonoBehaviour {
         _playerRef.GetComponent<PlayerHandler>().Enable();
         _transform.position = _sPosition;
         _playerRef.parent = null;
+        ballon.gameObject.SetActive(false);
         isAvailable = true;
     }
 
@@ -68,7 +78,7 @@ public class Respawner : MonoBehaviour {
     {
         AttachPlayer();
 
-        Vector3 targetPos = _transform.position+ Vector3.down;
+        Vector3 targetPos = _transform.position + Vector3.down;
 
         float currTime = 0.0f;
 

@@ -12,14 +12,15 @@ public class PlayerHandler : MonoBehaviour {
 
     public Transform pMaker;
     [HideInInspector]
-    public string id;
+    public int id;
 
     PlayerControl _pControl;
     PlayerInputs _pInputs;
     PlayerFighter _pFighter;
     Transform _transform;
 
-    Color _color;
+    [HideInInspector]
+    public Color _color;
     // INTERFACE -------------------------------------------------
 
     void Awake () {
@@ -31,14 +32,15 @@ public class PlayerHandler : MonoBehaviour {
 	
 	void Update () {
         RaycastHit hit;
-	    if(Physics.Raycast(transform.position, Vector3.down, out hit)){ 
-            pMaker.transform.position = hit.point;
+	    if(Physics.Raycast(transform.position + new Vector3(0, 0.1f, 0), Vector3.down, out hit)){
+            pMaker.transform.position = hit.point + new Vector3(0,0.1f,0);
         }
 	}
 
-    public void Setup(string nid, Color nColor)
+    public void Setup(int nid, Color nColor)
     {
         id = nid;
+        name = "Player" + nid;
         _color = nColor;
         pMaker.GetComponent<SpriteRenderer>().color = nColor;
     }
@@ -49,7 +51,7 @@ public class PlayerHandler : MonoBehaviour {
     public void askDie()
     {
         if (OnDeath != null)
-            OnDeath(id, transform);
+            OnDeath(name, transform);
     }
 
     public void Disable()

@@ -16,12 +16,15 @@ public class PlayerFighter : MonoBehaviour {
     [Range(0, 1)]
     public float blockSlowAmount = 0.2f;
 
+    [HideInInspector]
+    float multiplicator;
+
     Rigidbody _rigidbody;
     Animator _animator;
     Transform _transform;
     PlayerControl _pControl;
+    PlayerHandler _pHandler;
 
-    
     bool _isDamaged;
     bool isDamaged
     {
@@ -55,11 +58,19 @@ public class PlayerFighter : MonoBehaviour {
         _pControl = _transform.GetComponent<PlayerControl>();
         _rigidbody = _transform.GetComponent<Rigidbody>();
         _animator = _transform.GetChild(0).GetComponent<Animator>();
+        _pHandler = _transform.GetComponent<PlayerHandler>();
+
+        _pHandler.OnDeath += Reset;
 
         for (var i = 0; i < attacks.Length; i++)
         {
             attacks[i].Setup(_transform);
         }
+    }
+
+    void Reset(string pName, Transform transform)
+    {
+        multiplicator = 0;
     }
 
     // Update is called once per frame
@@ -101,8 +112,10 @@ public class PlayerFighter : MonoBehaviour {
         if (!isDamaged && !isBlocking)
         {
             isDamaged = true;
+            multiplicator += damage;
             Vector3 dir = player.transform.position - _transform.position;
-            _rigidbody.AddForce(-dir * damage * 1000);
+            _pControl.ScaleCheck(dir);
+            _rigidbody.AddForce(-dir * damage * 1000 * multiplicator);
             OnUpdate += Damage;
         }
     }
@@ -128,5 +141,13 @@ public class PlayerFighter : MonoBehaviour {
             noDamageTimer = 0;
             OnUpdate -= Damage;
         }
+    }
+
+    // DEBUG
+
+    void OnGUI()
+    {
+        GUI.color = Color.red;
+        GUI.Label(new Rect(300 * _pHandler.id + 30, 20, 100, 20), _pHandler.name+" : "+(multiplicator*100)+ " % ");
     }
 }
