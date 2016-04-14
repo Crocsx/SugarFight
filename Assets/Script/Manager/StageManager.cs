@@ -7,7 +7,7 @@ public class StageManager : MonoBehaviour {
     // EVENTS -----------------------------------------------------
 
     public delegate void OnPlayerSpawnDelegate(GameObject player);
-    public event OnPlayerSpawnDelegate OnPlayerSpawn;
+    public OnPlayerSpawnDelegate OnPlayerSpawn;
 
     // PROPERTIES --------------------------------------------------------
 
@@ -19,6 +19,7 @@ public class StageManager : MonoBehaviour {
     public Dictionary<string, int> lifeRemaining = new Dictionary<string, int>();
 
 
+    Color[] PlayerColor = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.grey, Color.black };
     // INTERFACE -----------------------------------------------------
 
     void Start ()
@@ -26,19 +27,29 @@ public class StageManager : MonoBehaviour {
         for (var i =0; i < nbPlayer; i++)
         {
             Respawner _respawner = FindAvailableRespawner();
-            GameObject nPlayer = SpawnPlayer(playerPrefab, ("Player"+ (i+1)));
+            GameObject nPlayer = SpawnPlayer(playerPrefab, ("Player"+ (i+1)), PlayerColor[i]);
             _respawner.AddPlayer(nPlayer.transform);
         }
+
+        EventManager.StartListening("OnPause", Pause);
 
         EventManager.TriggerEvent("OnStageStart");
     }
 
-    GameObject SpawnPlayer(GameObject prefab, string name)
+    void Pause()
+    {
+        Debug.Log("Pause");
+        Time.timeScale = 0;
+    }
+
+    GameObject SpawnPlayer(GameObject prefab, string name, Color color)
     {
         GameObject nPlayer = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
         nPlayer.name = name;
-        nPlayer.GetComponent<PlayerHandler>().id = name;
-        nPlayer.GetComponent<PlayerHandler>().OnDeath += PlayerDead;
+        PlayerHandler pHandler = nPlayer.GetComponent<PlayerHandler>();
+        pHandler.Setup(name, color);
+        pHandler.OnDeath += PlayerDead;
+        
         lifeRemaining.Add(name, nbLife);
 
         if (OnPlayerSpawn != null)
@@ -46,9 +57,6 @@ public class StageManager : MonoBehaviour {
 
         return nPlayer;
     }
-	void Update () {
-	
-	}
 
     void PlayerDead (string pName, Transform transform)
     {

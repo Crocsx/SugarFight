@@ -16,6 +16,7 @@ public class PlayerControl : MonoBehaviour
     [Header("JUMP PARAMS")]
     public float jumpForce = 12;
     public float jumpDuration = 0.5f;
+    public float jumpSlow = 0.8f;
     float _jmpDuration = 0;
     float _jmpForce = 0;
 
@@ -26,6 +27,9 @@ public class PlayerControl : MonoBehaviour
     Animator _animator;
     Transform _transform;
     Vector3 _initRotation;
+
+    [HideInInspector]
+    public bool disableMovement = false;
 
     bool _isInvulnerable = false;
     bool isInvulnerable
@@ -73,7 +77,12 @@ public class PlayerControl : MonoBehaviour
     void Start()
     {
         movement = Vector3.zero;
-        Reset();
+
+        if(isOnGround())
+            OnLeaveGround();
+        else
+            OnLeaveGround();
+
         _initRotation = transform.eulerAngles;
 
         OnFixedUpdate += Fall;
@@ -91,6 +100,11 @@ public class PlayerControl : MonoBehaviour
         if (collision.collider.CompareTag("Ground"))
         {
             OnEnterGround();
+        }
+        if (collision.collider.CompareTag("Player"))
+        {
+            _rigidbody.velocity = new Vector3(0, _rigidbody.velocity.y, 0);
+
         }
     }
 
@@ -137,13 +151,17 @@ public class PlayerControl : MonoBehaviour
 
     public void Move()
     {
+        if (disableMovement)
+            return;
+
         ScaleCheck(_movement);
         _rigidbody.AddForce(_movement * moveSpeed * Time.fixedDeltaTime * 1000);
     }
 
     public void onJump()
     {
-        OnFixedUpdate += Jump;
+        if(isGrounded)
+            OnFixedUpdate += Jump;
     }
 
     void ResetJump()
@@ -158,12 +176,14 @@ public class PlayerControl : MonoBehaviour
         if (OnGrounded != null)
             OnGrounded();
 
+        AugmentSpeed(jumpSlow);
         isFalling = false;
         isGrounded = true;
     }
 
     void OnLeaveGround()
     {
+        ReduceSpeed(jumpSlow);
         isGrounded = false;
         OnFixedUpdate += Fall;
     }
@@ -191,11 +211,30 @@ public class PlayerControl : MonoBehaviour
 
     public void ReduceSpeed(float slow)
     {
-        moveSpeed = moveSpeed * (1 - slow);
+        if (slow == 1)
+            disableMovement = true;
+        else
+            moveSpeed = moveSpeed * (1 - slow);
     }
 
     public void AugmentSpeed(float boost)
     {
-        moveSpeed = moveSpeed / (1 - boost);
+        if (boost == 1)
+            disableMovement = false;
+        else
+            moveSpeed = moveSpeed / (1 - boost);
+    }
+
+    bool isOnGround()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.0f))
+        {
+            if (hit.transform.CompareTag("Ground"))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
