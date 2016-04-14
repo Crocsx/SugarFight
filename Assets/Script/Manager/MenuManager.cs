@@ -62,7 +62,7 @@ public class MenuManager : MonoBehaviour {
     /* MENU : ouverture de la scène de jeu */
 	public void OnClickBtnPlay()
     {
-        SceneManager.LoadScene("DEMO_01");
+        SceneManager.LoadScene("MAIN_STAGE");
     }
 
     /* MENU : clic sur un bouton OPTIONS, CREDITS, RULES */
@@ -124,7 +124,6 @@ public class MenuManager : MonoBehaviour {
             btnFirstClic.SetActive(false);
             background2.SetActive(false);
             StartCoroutine(BgClickToPlayMove());
-            //StartCoroutine(MoveCameraMenu());
         }
     }
 
@@ -144,7 +143,6 @@ public class MenuManager : MonoBehaviour {
 
     }
 
-        // L'élément "Click to Play" du Titlecar se retire progressivement
     IEnumerator BgClickToPlayMove()
     {
         bgClickToPlay.SetActive(false);
