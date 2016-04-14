@@ -16,11 +16,18 @@ public class WaterFloat : MonoBehaviour {
 
     Quaternion startQuat;
 
-	// Use this for initialization
+    // init, that work even if script is disabled.
+    void Awake()
+    {
+        _rigidbody = GetComponent<Rigidbody>();
+        startQuat = _rigidbody.rotation;
+    }
+
+	/*
 	void Start () {
         _rigidbody = GetComponent<Rigidbody>();
         startQuat = _rigidbody.rotation;
-	}
+	}*/
 
 	
 	// Update is called once per frame
