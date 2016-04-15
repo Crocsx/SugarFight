@@ -24,8 +24,10 @@ public class StageManager : MonoBehaviour {
     public int nbLife = 4;
 
     public GameObject playerPrefab;
-
+    [HideInInspector]
     public Dictionary<string, playerReference> lifeRemaining = new Dictionary<string, playerReference>();
+    [HideInInspector]
+    public int loser;
 
     public Color[] PlayerColor = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.grey, Color.black };
     // INTERFACE -----------------------------------------------------
@@ -91,6 +93,7 @@ public class StageManager : MonoBehaviour {
         }
         else
         {
+            loser = lifeRemaining[pName].reference.GetComponent<PlayerHandler>().id;
             EventManager.TriggerEvent("EndGame");
             StartCoroutine("EndGame");
         }
