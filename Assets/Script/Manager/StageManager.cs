@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
-
+[System.Serializable]
+public class playerReference
+{
+    public GameObject reference;
+    public int lifeRemaining;
+}
 
 public class StageManager : MonoBehaviour {
 
-    [System.Serializable]
-    public class playerReference
-    {
-        public GameObject reference;
-        public int lifeRemaining;
-    }
 
     // EVENTS -----------------------------------------------------
 
@@ -26,7 +26,6 @@ public class StageManager : MonoBehaviour {
     public GameObject playerPrefab;
 
     public Dictionary<string, playerReference> lifeRemaining = new Dictionary<string, playerReference>();
-
 
     public Color[] PlayerColor = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.grey, Color.black };
     // INTERFACE -----------------------------------------------------
@@ -90,7 +89,18 @@ public class StageManager : MonoBehaviour {
             Respawner _respawner = FindAvailableRespawner();
             _respawner.AskRespawn(transform);
         }
+        else
+        {
+            EventManager.TriggerEvent("EndGame");
+            StartCoroutine("EndGame");
+        }
         EventManager.TriggerEvent("PlayerDeath");
+    }
+
+    IEnumerator EndGame()
+    {
+        yield return new WaitForSeconds(5);
+        SceneManager.LoadScene("Menu");
     }
 
     // METHODS --------------------------------------------------------

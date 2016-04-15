@@ -17,7 +17,7 @@ public class PlayerFighter : MonoBehaviour {
     public float blockSlowAmount = 0.2f;
 
     [HideInInspector]
-    float multiplicator;
+    public float multiplicator;
 
     Rigidbody _rigidbody;
     Animator _animator;
