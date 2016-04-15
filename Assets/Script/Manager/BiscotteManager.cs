@@ -15,10 +15,17 @@ public class BiscotteManager : MonoBehaviour {
     void Awake()
     {
         isActive = false;
+        isBreak = false;
         EventManager.StartListening("OnStageStart", StartCount);
     }
     // Use this for initialization
     void Start () {
+        biscotteEntiere.SetActive(true);
+
+        foreach (GameObject biscotte in biscotteMorceau)
+        {
+            biscotte.SetActive(false);
+        }
     }
 	
     void StartCount()
