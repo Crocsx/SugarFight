@@ -9,15 +9,27 @@ public class BiscotteManager : MonoBehaviour {
 
     public float timeBreakpoint = 19f;//secondes
 
+    bool isActive = false;
     bool isBreak = false;
 
+    void Awake()
+    {
+        isActive = false;
+        EventManager.StartListening("OnStageStart", StartCount);
+    }
     // Use this for initialization
     void Start () {
-	    
-	}
+    }
 	
-	// Update is called once per frame
-	void Update () {
+    void StartCount()
+    {
+
+        isActive = true;
+    }
+    // Update is called once per frame
+    void Update () {
+        if (!isActive)
+            return;
 
 	    if (Time.time >= timeBreakpoint && !isBreak)
         {

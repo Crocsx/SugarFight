@@ -25,6 +25,7 @@ public class UIinGame : MonoBehaviour {
     public void EnableScript(playerReference _fighter)
     {
         enabled = true;
+        _counter.enabled = true;
         entity = _fighter;
         _pFighter  = _fighter.reference.transform.GetComponent<PlayerFighter>();
         isStarted = true;
@@ -35,7 +36,7 @@ public class UIinGame : MonoBehaviour {
             return;
 
         percent = _pFighter.multiplicator;
-        _counter.text = (int)(percent*10) + " %";
+        _counter.text = (int)(percent*100) + " %";
     }
 	
 	// Update is called once per frame

@@ -95,12 +95,13 @@ public class PlayerControl : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.CompareTag("Ground"))
+        if (collision.collider.CompareTag("Ground") )
         {
             OnEnterGround();
         }
         if (collision.collider.CompareTag("Player"))
         {
+            OnEnterGround();
             _rigidbody.velocity = new Vector3(0, _rigidbody.velocity.y, 0);
 
         }
@@ -224,7 +225,7 @@ public class PlayerControl : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.0f))
         {
-            if (hit.transform.CompareTag("Ground"))
+            if (hit.transform.CompareTag("Ground") || hit.transform.CompareTag("Player"))
             {
                 return true;
             }
