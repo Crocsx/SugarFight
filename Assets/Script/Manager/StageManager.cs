@@ -3,15 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 
+[System.Serializable]
+public class playerReference
+{
+    public GameObject reference;
+    public int lifeRemaining;
+}
 
 public class StageManager : MonoBehaviour {
 
-    [System.Serializable]
-    public class playerReference
-    {
-        public GameObject reference;
-        public int lifeRemaining;
-    }
 
     // EVENTS -----------------------------------------------------
 
@@ -26,7 +26,6 @@ public class StageManager : MonoBehaviour {
     public GameObject playerPrefab;
 
     public Dictionary<string, playerReference> lifeRemaining = new Dictionary<string, playerReference>();
-
 
     public Color[] PlayerColor = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.grey, Color.black };
     // INTERFACE -----------------------------------------------------
