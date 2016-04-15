@@ -11,6 +11,7 @@ public class Attack_CaC : Attack {
         base.Setup(owner);
         hitboxHandler.Setup(pushDamage, _owner);
     }
+
     public override void OnUpdate()
     {
         if (isAttackPlaying)

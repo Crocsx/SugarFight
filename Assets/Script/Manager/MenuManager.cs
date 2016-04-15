@@ -122,7 +122,6 @@ public class MenuManager : MonoBehaviour {
         {
             isClicked = true;
             btnFirstClic.SetActive(false);
-            background2.SetActive(false);
             StartCoroutine(BgClickToPlayMove());
         }
     }

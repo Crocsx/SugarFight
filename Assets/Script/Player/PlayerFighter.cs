@@ -17,7 +17,7 @@ public class PlayerFighter : MonoBehaviour {
     public float blockSlowAmount = 0.2f;
 
     [HideInInspector]
-    float multiplicator;
+    public float multiplicator;
 
     Rigidbody _rigidbody;
     Animator _animator;
@@ -58,6 +58,12 @@ public class PlayerFighter : MonoBehaviour {
 
     void Start () {
         _transform = transform;
+
+        for (var i = 0; i < attacks.Length; i++)
+        {
+            attacks[i].Setup(_transform);
+        }
+
         _pControl = _transform.GetComponent<PlayerControl>();
         _rigidbody = _transform.GetComponent<Rigidbody>();
         _animator = _transform.GetChild(0).GetComponent<Animator>();
@@ -65,11 +71,6 @@ public class PlayerFighter : MonoBehaviour {
         _pSystem = _transform.GetComponent<ParticleSystem>();
         maxParticles = _pSystem.maxParticles;
         _pHandler.OnDeath += Reset;
-
-        for (var i = 0; i < attacks.Length; i++)
-        {
-            attacks[i].Setup(_transform);
-        }
     }
 
     void Reset(string pName, Transform transform)
@@ -148,13 +149,5 @@ public class PlayerFighter : MonoBehaviour {
             noDamageTimer = 0;
             OnUpdate -= Damage;
         }
-    }
-
-    // DEBUG
-
-    void OnGUI()
-    {
-        GUI.color = Color.red;
-        GUI.Label(new Rect(300 * _pHandler.id + 30, 20, 100, 20), _pHandler.name+" : "+(multiplicator*100)+ " % ");
     }
 }
