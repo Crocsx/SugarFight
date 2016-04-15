@@ -1,17 +1,17 @@
 fileFormatVersion: 2
-guid: 3f8299f12a562214896428134bcdcc0e
-timeCreated: 1460627524
+guid: 82d3e2fce7107cb439db4c122307e57f
+timeCreated: 1460704088
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
-    100002: polySurface12
+    100002: polySurface4
     400000: //RootNode
-    400002: polySurface12
-    2300000: polySurface12
-    3300000: polySurface12
-    4300000: polySurface12
+    400002: polySurface4
+    2300000: polySurface4
+    3300000: polySurface4
+    4300000: polySurface4
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -37,7 +37,7 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 200
+    globalScale: 300
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1
