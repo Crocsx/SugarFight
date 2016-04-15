@@ -24,6 +24,9 @@ public class PlayerFighter : MonoBehaviour {
     Transform _transform;
     PlayerControl _pControl;
     PlayerHandler _pHandler;
+    ParticleSystem _pSystem;
+
+    int maxParticles;
 
     bool _isDamaged;
     bool isDamaged
@@ -59,7 +62,8 @@ public class PlayerFighter : MonoBehaviour {
         _rigidbody = _transform.GetComponent<Rigidbody>();
         _animator = _transform.GetChild(0).GetComponent<Animator>();
         _pHandler = _transform.GetComponent<PlayerHandler>();
-
+        _pSystem = _transform.GetComponent<ParticleSystem>();
+        maxParticles = _pSystem.maxParticles;
         _pHandler.OnDeath += Reset;
 
         for (var i = 0; i < attacks.Length; i++)
@@ -111,7 +115,9 @@ public class PlayerFighter : MonoBehaviour {
     {
         if (!isDamaged && !isBlocking)
         {
+            _pSystem.Play();
             isDamaged = true;
+            _pSystem.maxParticles += (int)(maxParticles + (multiplicator * 10));
             multiplicator += damage;
             Vector3 dir = player.transform.position - _transform.position;
             _pControl.ScaleCheck(dir);
@@ -137,6 +143,7 @@ public class PlayerFighter : MonoBehaviour {
         noDamageTimer += Time.deltaTime;
         if (noDamageTimer > TimeInvulnerable)
         {
+            _pSystem.Stop();
             isDamaged = false;
             noDamageTimer = 0;
             OnUpdate -= Damage;

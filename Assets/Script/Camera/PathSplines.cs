@@ -5,6 +5,7 @@ public class PathSplines : MonoBehaviour {
 
 	public Transform[] trans;
     public Transform LookAt;
+    public bool skip;
 
 	LTSpline cr;
     float iter;
@@ -17,11 +18,15 @@ public class PathSplines : MonoBehaviour {
             pos[i] = trans[i].position;
         }
         cr = new LTSpline(pos);
-
     }
 
-	void Start () {
-		LeanTween.moveSpline(transform.gameObject, cr.pts, 17.5f).setOrientToPath(false).setDirection(1f).onComplete += OnEnd;
+	void Start ()
+    {
+        if (skip)
+            OnEnd();
+        else
+            LeanTween.moveSpline(transform.gameObject, cr.pts, 17.5f).setOrientToPath(false).setDirection(1f).onComplete += OnEnd;
+        
 	}
 	
     void OnEnd()

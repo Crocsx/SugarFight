@@ -56,7 +56,9 @@ public class Respawner : MonoBehaviour {
         _playerRef.GetComponent<PlayerHandler>().Disable();
 
         // SALE
-        _playerRef.GetComponent<PlayerControl>().ScaleCheck(-ballon.transform.position);
+        Vector3 side = ballon.transform.localPosition;
+        side.x = side.z;
+        _playerRef.GetComponent<PlayerControl>().ScaleCheck(side);
 
         ballon.GetComponent<SpriteRenderer>().color = _playerRef.GetComponent<PlayerHandler>()._color;
         _playerRef.position = transform.position;
