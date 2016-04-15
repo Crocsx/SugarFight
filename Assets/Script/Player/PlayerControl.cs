@@ -211,7 +211,13 @@ public class PlayerControl : MonoBehaviour
 
     public void AugmentSpeed(float boost)
     {
-        moveSpeed = initSpeed;
+        if (boost == 1)
+            disableMovement = false;
+        else
+            moveSpeed = moveSpeed / (1 - boost);
+
+        if (moveSpeed > initSpeed)
+            moveSpeed = initSpeed;
     }
 
     bool isOnGround()

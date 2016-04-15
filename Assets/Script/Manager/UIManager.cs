@@ -17,7 +17,7 @@ public class UIManager : MonoBehaviour {
 
     void onEnd()
     {
-        WinText.GetComponent<Text>().text = "Player " +(_stageManager.loser+1) + " Lose !!!";
+        WinText.GetComponent<Text>().text = "Player " +(_stageManager.loser+1) + " Loses !!!";
         WinText.SetActive(true);
     }
     void Setup()

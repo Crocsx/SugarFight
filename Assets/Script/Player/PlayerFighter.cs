@@ -132,12 +132,17 @@ public class PlayerFighter : MonoBehaviour {
         _rigidbody.velocity = Vector3.zero;
 
         if (value && _pControl.isGrounded)
+        {
             _pControl.ReduceSpeed(blockSlowAmount);
-        if(!value && isBlocking)
+            isBlocking = value;
+        }
+        if (!value && isBlocking)
+        {
             _pControl.AugmentSpeed(blockSlowAmount);
+            isBlocking = value;
+        }
 
-        isBlocking = value;
-    }
+   }
 
     void Damage()
     {

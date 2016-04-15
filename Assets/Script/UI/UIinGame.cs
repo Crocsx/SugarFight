@@ -11,7 +11,6 @@ public class UIinGame : MonoBehaviour {
     public GameObject sugar1;
     public GameObject sugar2;
     public GameObject sugar3;
-    public GameObject sugar4;
     public Text _counter;
     bool isStarted = false;
 
@@ -47,35 +46,24 @@ public class UIinGame : MonoBehaviour {
             sugar1.SetActive(false);
             sugar2.SetActive(false);
             sugar3.SetActive(false);
-            sugar4.SetActive(false);
         }
         else if (value == 1)
         {
             sugar1.SetActive(true);
             sugar2.SetActive(false);
             sugar3.SetActive(false);
-            sugar4.SetActive(false);
         }
         else if (value == 2)
         {
             sugar1.SetActive(true);
             sugar2.SetActive(true);
             sugar3.SetActive(false);
-            sugar4.SetActive(false);
         }
         else if (value == 3)
         {
             sugar1.SetActive(true);
             sugar2.SetActive(true);
             sugar3.SetActive(true);
-            sugar4.SetActive(false);
-        }
-        else if (value == 4)
-        {
-            sugar1.SetActive(true);
-            sugar2.SetActive(true);
-            sugar3.SetActive(true);
-            sugar4.SetActive(true);
         }
     }
 
