@@ -26,7 +26,6 @@ public class PlayerControl : MonoBehaviour
     Rigidbody _rigidbody;
     Animator _animator;
     Transform _transform;
-    Vector3 _initRotation;
 
     [HideInInspector]
     public bool disableMovement = false;
@@ -82,8 +81,6 @@ public class PlayerControl : MonoBehaviour
             OnLeaveGround();
         else
             OnLeaveGround();
-
-        _initRotation = transform.eulerAngles;
 
         OnFixedUpdate += Fall;
         OnFixedUpdate += Move;

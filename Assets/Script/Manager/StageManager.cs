@@ -2,7 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
+
+
 public class StageManager : MonoBehaviour {
+
+    [System.Serializable]
+    public class playerReference
+    {
+        public GameObject reference;
+        public int lifeRemaining;
+    }
 
     // EVENTS -----------------------------------------------------
 
@@ -16,23 +25,27 @@ public class StageManager : MonoBehaviour {
 
     public GameObject playerPrefab;
 
-    public Dictionary<string, int> lifeRemaining = new Dictionary<string, int>();
+    public Dictionary<string, playerReference> lifeRemaining = new Dictionary<string, playerReference>();
 
 
     public Color[] PlayerColor = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.grey, Color.black };
     // INTERFACE -----------------------------------------------------
 
-    void Start ()
+    void Awake ()
     {
-        for (var i =0; i < nbPlayer; i++)
+        EventManager.StartListening("OnPause", Pause);
+        EventManager.StartListening("UnPause", unPause);
+        EventManager.StartListening("OnCinematicFinished", SpawnPlayers);
+    }
+
+    void SpawnPlayers()
+    {
+        for (var i = 0; i < nbPlayer; i++)
         {
             Respawner _respawner = FindAvailableRespawner();
             GameObject nPlayer = SpawnPlayer(playerPrefab, i, PlayerColor[i]);
             _respawner.AddPlayer(nPlayer.transform);
         }
-
-        EventManager.StartListening("OnPause", Pause);
-        EventManager.StartListening("UnPause", unPause);
 
         EventManager.TriggerEvent("OnStageStart");
     }
@@ -53,8 +66,12 @@ public class StageManager : MonoBehaviour {
         PlayerHandler pHandler = nPlayer.GetComponent<PlayerHandler>();
         pHandler.Setup(id, color);
         pHandler.OnDeath += PlayerDead;
-        
-        lifeRemaining.Add(("Player" + id), nbLife);
+
+        playerReference newPlayer = new playerReference();
+        newPlayer.reference = nPlayer;
+        newPlayer.lifeRemaining = nbLife;
+
+        lifeRemaining.Add(("Player" + id), newPlayer);
 
         if (OnPlayerSpawn != null)
             OnPlayerSpawn(nPlayer);
@@ -66,13 +83,14 @@ public class StageManager : MonoBehaviour {
     {
         if (lifeRemaining.ContainsKey(pName))
         {
-            --lifeRemaining[pName];
+            --lifeRemaining[pName].lifeRemaining;
         }
-        if(lifeRemaining[pName] > 0)
+        if(lifeRemaining[pName].lifeRemaining > 0)
         {
             Respawner _respawner = FindAvailableRespawner();
             _respawner.AskRespawn(transform);
         }
+        EventManager.TriggerEvent("PlayerDeath");
     }
 
     // METHODS --------------------------------------------------------
