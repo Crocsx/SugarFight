@@ -9,6 +9,8 @@ public class BiscotteManager : MonoBehaviour {
 
     public float timeBreakpoint = 19f;//secondes
 
+
+    float _timer = 0;
     bool isActive = false;
     bool isBreak = false;
 
@@ -30,15 +32,16 @@ public class BiscotteManager : MonoBehaviour {
 	
     void StartCount()
     {
-
         isActive = true;
     }
     // Update is called once per frame
     void Update () {
-        if (!isActive)
+        if (!isActive || isBreak)
             return;
 
-	    if (Time.time >= timeBreakpoint && !isBreak)
+        _timer += Time.deltaTime;
+
+        if (_timer >= timeBreakpoint)
         {
             biscotteEntiere.SetActive(false);
 
