@@ -151,10 +151,10 @@ public class MenuManager : MonoBehaviour {
         btnCredits.SetActive(true);
 
         Vector3 startPositionPlayBtn = btnPlay.transform.position;
-        Vector3 endPositionPlayBtn = startPositionPlayBtn + new Vector3(110, 0, 0);
+        Vector3 endPositionPlayBtn = startPositionPlayBtn + new Vector3(100, 0, 0);
 
         Vector3 startPositionRulesBtn = btnRules.transform.position;
-        Vector3 endPositionRulesBtn = startPositionRulesBtn + new Vector3(-110, 0, 0);
+        Vector3 endPositionRulesBtn = startPositionRulesBtn + new Vector3(-100, 0, 0);
 
         Vector3 startPositionOptionBtn = btnOptions.transform.position;
         Vector3 endPositionOptionBtn = startPositionOptionBtn + new Vector3(90, 0, 0);
