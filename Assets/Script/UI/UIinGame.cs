@@ -35,7 +35,7 @@ public class UIinGame : MonoBehaviour {
             return;
 
         percent = _pFighter.multiplicator;
-        _counter.text = (percent*10) + " %";
+        _counter.text = (int)(percent*10) + " %";
     }
 	
 	// Update is called once per frame
