@@ -16,10 +16,15 @@ public class Attack_Distance : Attack {
             _ratio += Time.deltaTime;
             if (!_spawned && attackTimer > timeCharge)
             {
+                Animator _anim = _owner.transform.GetChild(0).GetComponent<Animator>();
+                _anim.SetBool("SpitCharge", false);
+                _anim.SetBool("Spit", true);
                 Spawn();
             }
             if (attackTimer > attackRecovery)
             {
+                Animator _anim = _owner.transform.GetChild(0).GetComponent<Animator>();
+                _anim.SetBool("Spit", false);
                 Stop();
             }
             attackTimer += Time.deltaTime;

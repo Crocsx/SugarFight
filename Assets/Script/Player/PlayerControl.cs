@@ -26,6 +26,7 @@ public class PlayerControl : MonoBehaviour
     Rigidbody _rigidbody;
     Animator _animator;
     Transform _transform;
+    float initSpeed;
 
     [HideInInspector]
     public bool disableMovement = false;
@@ -76,8 +77,8 @@ public class PlayerControl : MonoBehaviour
     void Start()
     {
         movement = Vector3.zero;
-
-        if(isOnGround())
+        initSpeed = moveSpeed;
+        if (isOnGround())
             OnLeaveGround();
         else
             OnLeaveGround();
@@ -213,6 +214,9 @@ public class PlayerControl : MonoBehaviour
             disableMovement = false;
         else
             moveSpeed = moveSpeed / (1 - boost);
+
+        if (moveSpeed > initSpeed)
+            moveSpeed = initSpeed;
     }
 
     bool isOnGround()
