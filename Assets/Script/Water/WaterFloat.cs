@@ -11,6 +11,7 @@ public class WaterFloat : MonoBehaviour {
     public Vector3 actionPoint;
     public Vector3 upLift;
     public float coeffTorque = 1;
+    public GameObject pivotCenter = null;
 
     private Rigidbody _rigidbody;
 
@@ -19,6 +20,7 @@ public class WaterFloat : MonoBehaviour {
     // init, that work even if script is disabled.
     void Awake()
     {
+        if (pivotCenter != null) ConfigActionPoint(pivotCenter);
         _rigidbody = GetComponent<Rigidbody>();
         startQuat = _rigidbody.rotation;
     }
@@ -52,7 +54,19 @@ public class WaterFloat : MonoBehaviour {
         _rigidbody.AddTorque(vector * angle * coeffTorque);
 	}
 
+    // permet de positionner buoyancyCenterOffset (offset) à partir d'un vector (tiré d'un gameObject de la scène)
+    // ainsi que le offset y poru center au milieu de l'eau (pas sûr de cela)
+    // désactive le gameObject passé en param
+    void ConfigActionPoint(GameObject pivotCenter)
+    {
+        Vector3 vec3Center = pivotCenter.transform.position;
 
+        buoyancyCenterOffset.x = vec3Center.x - transform.position.x;
+        buoyancyCenterOffset.z = vec3Center.z - transform.position.z;
+        buoyancyCenterOffset.y = transform.localScale.y / 2; // scale == width in flash ?
+
+        pivotCenter.SetActive(false);
+    }
 
 
 }
