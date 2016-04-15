@@ -49,19 +49,19 @@ public class PlayerInputs : MonoBehaviour {
         if(_player.GetButtonDown("Jump"))
             _pController.onJump();
 
-        if (_player.GetButtonDown("Fire1"))
+        if (_player.GetButtonDown("FaceAttack"))
             _pFighter.onAttack(0);
-        if (_player.GetButtonUp("Fire1"))
+        if (_player.GetButtonUp("FaceAttack"))
             _pFighter.askStopAttack(0);
 
-        if (_player.GetButtonDown("Fire2"))
-            _pFighter.onAttack(1);
-        if (_player.GetButtonUp("Fire2"))
-            _pFighter.askStopAttack(1);
+        if (_player.GetButtonDown("StrongAttack") && _pController.isGrounded)
+            _pFighter.onAttack(2);
+        if (_player.GetButtonDown("StrongAttack") && !_pController.isGrounded)
+            _pFighter.onAttack(5);
 
-        if (_player.GetButtonDown("Fire3"))
+        if (_player.GetButtonDown("Spit"))
             _pFighter.onAttack(3); 
-        if (_player.GetButtonUp("Fire3"))
+        if (_player.GetButtonUp("Spit"))
             _pFighter.askStopAttack(3);
 
         if (_player.GetButtonDown("Block"))

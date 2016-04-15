@@ -25,10 +25,9 @@ public class Attack_Distance : Attack {
             attackTimer += Time.deltaTime;
         }
     }
-
     void Spawn()
     {
-        GameObject pjt = Instantiate(Projectile, _owner.position - Vector3.Scale(_owner.right, _owner.localScale), Quaternion.identity) as GameObject;
+        GameObject pjt = Instantiate(Projectile, _owner.position + (Vector3.Scale(_owner.right, _owner.localScale)* 2), Quaternion.identity) as GameObject;
         pjt.transform.GetComponent<Bullet>().Launch(_owner, (_ratio / timeCharge));
         _spawned = true;
         attackTimer = timeCharge;
