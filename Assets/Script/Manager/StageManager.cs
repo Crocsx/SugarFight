@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class playerReference
@@ -89,7 +89,18 @@ public class StageManager : MonoBehaviour {
             Respawner _respawner = FindAvailableRespawner();
             _respawner.AskRespawn(transform);
         }
+        else
+        {
+            EventManager.TriggerEvent("EndGame");
+            StartCoroutine("EndGame");
+        }
         EventManager.TriggerEvent("PlayerDeath");
+    }
+
+    IEnumerator EndGame()
+    {
+        yield return new WaitForSeconds(5);
+        SceneManager.LoadScene("Menu");
     }
 
     // METHODS --------------------------------------------------------
