@@ -16,12 +16,12 @@ public class FightingCamera : MonoBehaviour {
     // Expecting 2 players only
     public List<GameObject> players = new List<GameObject>();
 
+    public GameObject initPosition;
     public float ANGLE_VIEW = 45; // degree
-    public float SMOOTH = 14;
-    public float MIN_DISTANCE = 5;
-    public float MARGIN_ZOOM = 0.25f;
-    //public float MAX_DISTANCE_BETWEEN_PLAYERS = 20;
-    public float MAX_DISTANCE_PLAYER_TO_STAGE = 15;
+    public float SMOOTH = 150;
+    public float MARGE_ZOOM = 0.2f;
+    public float ZOOM_MIN_DISTANCE = 8f;
+    public float MAX_DISTANCE_PLAYER_TO_STAGE = 30; // if > then is ignored by camera
     public StageManager _sManager;
     public GameObject stage;
     public bool active;
@@ -32,13 +32,16 @@ public class FightingCamera : MonoBehaviour {
     float       centerToCameraBefore = 0;
     Vector3     centerBefore;
     Vector3     center;
-    Vector3     cameraTargetPosition;
+    //Vector3     cameraTargetPosition;
+    List<int>   ignoredPlayers;
+    Vector3     initToStagePosition;
 
     void Awake ()
     {
         _transform = transform;
         myCamera = _transform.GetComponent<Camera>();
         active = false;
+        ignoredPlayers = new List<int>();
         players.Clear();
 
         EventManager.StartListening("OnStageStart", startSpawn);
@@ -48,18 +51,21 @@ public class FightingCamera : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        center = Vector3.zero;
-        centerBefore = Vector3.zero;
-        cameraTargetPosition = _transform.position;
-        centerToCameraBefore = Vector3.Magnitude(_transform.position - center);
+        //initPosition.transform.position = new Vector3(initPosition.transform.position.x, -initPosition.transform.position.y, initPosition.transform.position.z);
+        //_transform.position = initPosition.transform.position != null ? -initPosition.transform.position : _transform.position;
+
+        center = stage.transform.position;
+        centerBefore = stage.transform.position;
+        initToStagePosition = initPosition.transform.position - center;
 
         myCamera.fieldOfView = ANGLE_VIEW;
     }
 
     void startSpawn()
     {
-        updateCenter();
-        _transform.LookAt(center);
+        // semble être inutile
+        //updateCenter();
+        //_transform.LookAt(center);
     }
 
     // Permet d'ajouter les players que la caméra suit par code
@@ -74,25 +80,30 @@ public class FightingCamera : MonoBehaviour {
         if (!active)
             return;
         updateCenter();
-        /* pas la solution idéale
-        if (DistanceMaxPlayers() > MAX_DISTANCE_BETWEEN_PLAYERS)
-        {
-            return;
-        }*/
 
-        cameraTargetPosition += center - centerBefore; //duplique les mvts du center pour la caméra
-        //_transform.position  += center - centerBefore; //duplique les mvts de la camera
-        _transform.position  += (cameraTargetPosition - _transform.position) / SMOOTH; // smooth tendant vers cameraTargetPosition
 
-        _transform.LookAt(center); // focus centre.
+        Vector3 cameraStartPos = _transform.position;
+        Vector3 cameraEndPos;
 
-        CorrectZoom();
+
+        _transform.position = center + initToStagePosition;
+
+        Debug.DrawLine(center, _transform.position, Color.red);
+        _transform.LookAt(center); // attention a désactiver PathSplines !
+        
+        _transform.position += CorrectZoom();
+
+
+        // Smooth
+        cameraEndPos = _transform.position;
+        _transform.position = cameraStartPos;
+        _transform.position += Vec3Floor(cameraEndPos - cameraStartPos, 1000) / SMOOTH;
 
         centerBefore = center;
     }
 
     // corrige le zoom
-    void CorrectZoom()
+    Vector3 CorrectZoom()
     {
         const float HALF_CAMERA = 0.5f;
         float pourcentOutHorizontal = 0f;
@@ -104,11 +115,18 @@ public class FightingCamera : MonoBehaviour {
         // obtenir les dépassements de l'écran en % de taille du viewport
         for (int i = 0; i < playersLength; i++)
         {
+            bool ignore = false;
+            foreach (int myInt in ignoredPlayers)
+            {
+                if (myInt == i) ignore = true;
+            }
+            if (ignore) continue;
+
             // calcul de la distance la plus éloigné, en vertical ainsi qu'en horizontale
             Vector3 distance = myCamera.WorldToViewportPoint(players[i].transform.position);
             distance -= new Vector3(HALF_CAMERA, HALF_CAMERA, -distance.z); // position à partir du centre de l'écran
 
-            if (distance.z > 0) return; // au cas où un joueur passe derrière la caméra (interdit), possible que si un joueur est trop éloigné du stage.
+            if (distance.z < 0) return Vector3.zero; // au cas où un joueur passe derrière la caméra (interdit), possible que si un joueur est trop éloigné du stage.
 
             if (Mathf.Abs(distance.x) > Mathf.Abs(farestPlayerHorizontal.x))
             {
@@ -126,63 +144,71 @@ public class FightingCamera : MonoBehaviour {
         // si 1.1 alros ils faut zoomOut de 10%
         // souvent entre 0.5 et 1+
         // multiplié par deux
-        pourcentOutHorizontal = Mathf.Abs(farestPlayerHorizontal.x);
-        pourcentOutVertical = Mathf.Abs(farestPlayerVertical.y);
+        pourcentOutHorizontal = Mathf.Abs(farestPlayerHorizontal.x)*2;
+        pourcentOutVertical = Mathf.Abs(farestPlayerVertical.y)*2;
 
         // définit la priorité horizontale ou verticale
         float zoomChange = pourcentOutHorizontal > pourcentOutVertical ? pourcentOutHorizontal : pourcentOutVertical;
-        zoomChange *= 2;
-        zoomChange += MARGIN_ZOOM;
 
         // distance caméra centre actuel
-        float newCenterToCamera = Vector3.Magnitude(_transform.position - center);
-        newCenterToCamera *= zoomChange;
+        centerToCameraBefore = Vector3.Magnitude(_transform.position - center); // cameraTargetPosition ?
+        float newCenterToCamera = centerToCameraBefore * (zoomChange + MARGE_ZOOM);
 
+        // faire math.round pour éviter un très léger tremblement de zoom ?
+        Vector3 vec3ZoomChange = transform.forward * (centerToCameraBefore - newCenterToCamera); // vecteur de changement
 
-        if (newCenterToCamera > MIN_DISTANCE)
+        if (newCenterToCamera < ZOOM_MIN_DISTANCE)
         {
-            Vector3 vec3ZoomChange = transform.forward * (centerToCameraBefore - newCenterToCamera); // vecteur de changement
-            _transform.position += vec3ZoomChange;
+            return transform.forward * (centerToCameraBefore - ZOOM_MIN_DISTANCE);
         }
-
-        centerToCameraBefore = newCenterToCamera;
+        return vec3ZoomChange;
     }
 
     void updateCenter()
     {
+        ignoredPlayers = new List<int>();
         center = Vector3.zero;
         float skippedPlayers = 0f;
 
-        if(playersLength > 0)
-        {
-            for (int i = 0; i < playersLength; i++)
-            {
-                if (Vector3.Magnitude(players[i].transform.position - stage.transform.position) > MAX_DISTANCE_PLAYER_TO_STAGE)
-                {
-                    skippedPlayers++;
-                    continue;
-                }
-                center += players[i].transform.position;
-            }
-            center /= playersLength - skippedPlayers;
-        }
-    }
-    /* pas la solution idéale (freeze la caméra si distance max entre joueurs....
-    float DistanceMaxPlayers()
-    {
-        float maxDistance = 0f;
 
         for (int i = 0; i < playersLength; i++)
         {
-            for (int u = 0; u < playersLength; u++)
+            if (Vector3.Magnitude(players[i].transform.position - stage.transform.position) > MAX_DISTANCE_PLAYER_TO_STAGE)
             {
-                float distanceBetweenPlayers = Vector3.Magnitude(players[i].transform.position - players[u].transform.position);
-                if (distanceBetweenPlayers > maxDistance)
-                {
-                    maxDistance = distanceBetweenPlayers;
-                }
+                ignoredPlayers.Add(i);
+                skippedPlayers++;
+                continue;
             }
+            center += players[i].transform.position;
         }
-            return maxDistance;
+
+        Debug.DrawLine(players[0].transform.position, players[1].transform.position, Color.red);
+
+
+        if (playersLength - skippedPlayers > 0)
+        {
+            center /= playersLength - skippedPlayers;
+        } else {
+            center = stage.transform.position;
+            Debug.Log("all players ignored or no players, default focus is stage.transform.position");
+        }
+    }
+
+    /*
+    void LookTo(Vector3 pTarget, Transform pTransform)
+    {
+        Vector3 relativePos = pTarget - pTransform.position;
+        Quaternion rotation = Quaternion.LookRotation(relativePos);
+        pTransform.rotation = rotation;
     }*/
+
+    // réduit un peu les tremblement de la caméra
+    Vector3 Vec3Floor (Vector3 vector, int length) {
+        vector.x = Mathf.Floor(vector.x * length) / length;
+        vector.y = Mathf.Floor(vector.y * length) / length;
+        vector.z = Mathf.Floor(vector.z * length) / length;
+
+
+        return vector;
+    }
 }

@@ -9,6 +9,7 @@ public class PathSplines : MonoBehaviour {
 
 	LTSpline cr;
     float iter;
+    bool isEnd = false;
 
     void OnEnable(){
         Vector3[] pos = new Vector3[trans.Length];
@@ -32,10 +33,13 @@ public class PathSplines : MonoBehaviour {
     void OnEnd()
     {
         transform.GetComponent<FightingCamera>().active = true;
+        isEnd = true;
         EventManager.TriggerEvent("OnCinematicFinished");
     }
 
 	void Update () {
+        if (isEnd) return;
+
 		iter += Time.deltaTime;
 		if(iter>1.0f)
 			iter = 0.0f;
